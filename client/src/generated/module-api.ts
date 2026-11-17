@@ -286,6 +286,8 @@ export interface components {
             tasks: components["schemas"]["TaskView"][];
             printer_hours?: number;
             tools?: components["schemas"]["ToolHours"][];
+            set_id?: string;
+            set_name?: string;
         };
         TemplateTask: {
             id: string;

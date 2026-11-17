@@ -812,6 +812,12 @@
             "items": {
               "$ref": "#/components/schemas/ToolHours"
             }
+          },
+          "set_id": {
+            "type": "string"
+          },
+          "set_name": {
+            "type": "string"
           }
         },
         "required": [

@@ -11,7 +11,7 @@
   } from '@prusa/connect-ui/primitives';
 
   import { heldHost } from './host';
-  import { maintenanceOn, type Overview, type TaskView } from './maintenance';
+  import { maintenanceOn, type Overview, type Set, type TaskView } from './maintenance';
 
   let { deviceId }: { deviceId: string } = $props();
 
@@ -24,7 +24,7 @@
   let printerDraft = $state('');
   let pendingDone = $state<TaskView | undefined>();
   let pendingToolReset = $state<number | undefined>();
-  let sets = $state<{ id: string; name: string; enabled: boolean }[]>([]);
+  let sets = $state<Set[]>([]);
 
   const device = $derived(
     overview?.devices.find((entry) => entry.id === deviceId),
@@ -33,7 +33,7 @@
   async function load(): Promise<void> {
     try {
       overview = await api.overview(host.signal);
-      sets = (await api.sets(host.signal)).sets ?? [];
+      sets = (await api.sets(host.signal)).sets;
     } catch {
       overview = undefined;
     }
@@ -47,7 +47,7 @@
 
   const setChoices = $derived(
     sets
-      .filter((entry) => entry.enabled)
+      .filter((entry) => entry.enabled === true)
       .map((entry) => ({ value: entry.id, label: entry.name })),
   );
 

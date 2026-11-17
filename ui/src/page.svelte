@@ -20,7 +20,10 @@
   const signal = host.signal;
   const api = maintenanceOn(host);
 
-  type Model = { value: string; label: string };
+  interface Model {
+    value: string;
+    label: string;
+  }
 
   let sets = $state<Set[]>([]);
   let busy = $state(false);
@@ -56,7 +59,7 @@
   async function load() {
     try {
       const answer = await api.sets(signal);
-      sets = answer.sets ?? [];
+      sets = answer.sets;
     } catch (error) {
       notice = String(error);
     }
@@ -259,8 +262,8 @@
                 <span class="text-sm">{task.name}</span>
                 <span class="text-neutral-500 text-sm">
                   {task.kind === 'days'
-                    ? `${task.interval_days} d`
-                    : `${task.interval_hours} h`}
+                    ? `${String(task.interval_days ?? 0)} d`
+                    : `${String(task.interval_hours ?? 0)} h`}
                   {#if task.material}· {task.material}{/if}
                 </span>
                 {#if !set.builtin}
@@ -268,7 +271,8 @@
                     variant="ghost"
                     size="sm"
                     disabled={busy}
-                    onclick={() => dropTask(set, task.id)}
+                    onclick={() =>
+                      task.id !== undefined && dropTask(set, task.id)}
                   >
                     {t('maintenance.page.remove')}
                   </Button>
@@ -279,12 +283,12 @@
                     onclick={() =>
                       saveTask(
                         set,
-                        task.id,
+                        task.id ?? '',
                         task.name,
                         task.kind,
-                        task.kind === 'days'
+                        (task.kind === 'days'
                           ? task.interval_days
-                          : task.interval_hours,
+                          : task.interval_hours) ?? 0,
                       )}
                   >
                     {t('maintenance.page.save')}
