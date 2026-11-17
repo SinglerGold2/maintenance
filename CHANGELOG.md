@@ -3,6 +3,14 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.4.1 - 2026-11-17
+
+### Changed
+
+- Every task keeps its interval field, so any task can be retuned. The free
+  text field for the nozzle material is gone; the material a task carries is
+  shown beside its interval, and a proper picker replaces the text field later.
+
 ## 0.4.0 - 2026-11-17
 
 ### Added

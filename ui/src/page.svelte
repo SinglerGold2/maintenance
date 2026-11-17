@@ -329,9 +329,32 @@
                     <div>
                       <div class="font-medium">{task.name}</div>
                       <div class="text-neutral-600 text-sm">
-                        {#if task.material}
-                          {task.material} ·
-                        {/if}
+                        <div class="flex flex-wrap items-center gap-2">
+                          <Input
+                            type="number"
+                            min="1"
+                            value={edit.interval}
+                            aria-label={t('maintenance.page.interval')}
+                            class="w-24"
+                            oninput={(event: Event) => {
+                              const target =
+                                event.currentTarget as HTMLInputElement | null;
+                              if (target !== null) {
+                                edits[task.id] = {
+                                  ...edit,
+                                  interval: target.valueAsNumber,
+                                };
+                              }
+                            }}
+                          />
+                          <Button
+                            size="sm"
+                            disabled={busy}
+                            onclick={() => saveTask(device.id, task)}
+                          >
+                            {t('maintenance.page.save')}
+                          </Button>
+                        </div>
                         {t('maintenance.page.every')}
                         {intervalText(task)}
                         · {t('maintenance.page.sinceLast')}
