@@ -286,7 +286,7 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		printerHours, known, hoursErr := st.PrinterHours(r.Context(), device.ID)
+		offset, known, hoursErr := st.PrinterOffset(r.Context(), device.ID)
 		if hoursErr != nil {
 			refuse(w, r, StoreFailed.New("the printer's own hours could not be read").With(faultString("reason", hoursErr.Error())))
 			return
@@ -294,7 +294,10 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 
 		var typed *float64
 		if known {
-			typed = &printerHours
+			// The printer keeps the lead it had when the operator typed its
+			// value in, so both counters move with every print.
+			projected := hours + offset
+			typed = &projected
 		}
 
 		views = append(views, DeviceView{
@@ -443,7 +446,13 @@ func handlePrinterHours(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if storeErr := st.SetPrinterHours(r.Context(), sent.DeviceID, sent.Hours); storeErr != nil {
+	tracked, _, trackedErr := state.hoursOf(r.Context(), sent.DeviceID)
+	if trackedErr != nil {
+		refuse(w, r, HistoryFailed.New("the print history could not be read").With(faultString("reason", trackedErr.Error())))
+		return
+	}
+
+	if storeErr := st.SetPrinterHours(r.Context(), sent.DeviceID, sent.Hours, tracked); storeErr != nil {
 		refuse(w, r, StoreFailed.New("the printer's own hours could not be written").With(faultString("reason", storeErr.Error())))
 		return
 	}

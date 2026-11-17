@@ -93,13 +93,14 @@ func (s *store) Delete(ctx context.Context, id string) error {
 	return err
 }
 
-// PrinterHours is the count the machine shows on its own display, as the
-// operator typed it in. The second answer says whether a value was stored.
-func (s *store) PrinterHours(ctx context.Context, deviceID string) (float64, bool, error) {
-	query := fmt.Sprintf(`SELECT total_hours FROM maintenance_printer_hours WHERE device_id = %s`, s.place(1))
+// PrinterOffset is how far the machine's own counter is ahead of the hours this
+// server has seen. The second answer says whether the operator ever typed the
+// printer's value in.
+func (s *store) PrinterOffset(ctx context.Context, deviceID string) (float64, bool, error) {
+	query := fmt.Sprintf(`SELECT offset_hours FROM maintenance_printer_hours WHERE device_id = %s`, s.place(1))
 
-	var hours float64
-	err := s.db.QueryRowContext(ctx, query, deviceID).Scan(&hours)
+	var offset float64
+	err := s.db.QueryRowContext(ctx, query, deviceID).Scan(&offset)
 	if err == sql.ErrNoRows {
 		return 0, false, nil
 	}
@@ -108,16 +109,19 @@ func (s *store) PrinterHours(ctx context.Context, deviceID string) (float64, boo
 		return 0, false, err
 	}
 
-	return hours, true, nil
+	return offset, true, nil
 }
 
-func (s *store) SetPrinterHours(ctx context.Context, deviceID string, hours float64) error {
-	query := fmt.Sprintf(`INSERT INTO maintenance_printer_hours (device_id, total_hours, updated_at)
-        VALUES (%s, %s, %s)
+// SetPrinterHours stores the distance between the value the operator read off
+// the machine and the hours this server has tracked so far.
+func (s *store) SetPrinterHours(ctx context.Context, deviceID string, printerHours, trackedHours float64) error {
+	query := fmt.Sprintf(`INSERT INTO maintenance_printer_hours (device_id, total_hours, offset_hours, updated_at)
+        VALUES (%s, %s, %s, %s)
         ON CONFLICT (device_id) DO UPDATE SET total_hours = EXCLUDED.total_hours,
-        updated_at = EXCLUDED.updated_at`, s.place(1), s.place(2), s.place(3))
+        offset_hours = EXCLUDED.offset_hours, updated_at = EXCLUDED.updated_at`,
+		s.place(1), s.place(2), s.place(3), s.place(4))
 
-	_, err := s.db.ExecContext(ctx, query, deviceID, hours, nowText())
+	_, err := s.db.ExecContext(ctx, query, deviceID, printerHours, printerHours-trackedHours, nowText())
 
 	return err
 }

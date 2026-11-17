@@ -3,6 +3,15 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.4.2 - 2026-11-17
+
+### Fixed
+
+- The printer's own counter moves on with every print. What the operator types
+  in sets the distance between the machine's display and the hours the server
+  has seen, and that distance stays. A printer 283 hours ahead stays 283 hours
+  ahead after the next print.
+
 ## 0.4.1 - 2026-11-17
 
 ### Changed
