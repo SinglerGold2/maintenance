@@ -354,10 +354,25 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// One tool takes every hour the printer ran: nothing is split, and the
-		// printer's own counter is the honest figure. A multi-tool printer keeps
-		// the share each readable print gave it.
+		// printer's own counter is the honest figure, less whatever a reset
+		// already put behind it.
 		if len(toolMap) <= 1 {
-			toolMap = map[int]float64{0: counter}
+			reset, hasReset, resetErr := st.ToolReset(r.Context(), device.ID, 0)
+			if resetErr != nil {
+				refuse(w, r, StoreFailed.New("the tool reset could not be read").With(faultString("reason", resetErr.Error())))
+				return
+			}
+
+			single := counter
+			if hasReset {
+				single = counter - reset
+			}
+
+			if single < 0 {
+				single = 0
+			}
+
+			toolMap = map[int]float64{0: single}
 		}
 
 		tools := make([]ToolHours, 0, len(toolMap))

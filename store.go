@@ -283,6 +283,25 @@ func (s *store) ResetTool(ctx context.Context, deviceID string, tool int, at flo
 	return err
 }
 
+// ToolReset is the hours a tool had when it was last reset, and false when it
+// never was.
+func (s *store) ToolReset(ctx context.Context, deviceID string, tool int) (float64, bool, error) {
+	query := fmt.Sprintf(`SELECT reset_hours FROM maintenance_tool_hours WHERE device_id = %s AND tool = %s`,
+		s.place(1), s.place(2))
+
+	var reset float64
+	err := s.db.QueryRowContext(ctx, query, deviceID, tool).Scan(&reset)
+	if err == sql.ErrNoRows {
+		return 0, false, nil
+	}
+
+	if err != nil {
+		return 0, false, err
+	}
+
+	return reset, true, nil
+}
+
 func (s *store) AddToolHours(ctx context.Context, deviceID string, tool int, hours float64) error {
 	query := fmt.Sprintf(`INSERT INTO maintenance_tool_hours (device_id, tool, hours, updated_at)
         VALUES (%s, %s, %s, %s)
