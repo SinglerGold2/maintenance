@@ -17,6 +17,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -29,8 +30,11 @@ import (
 	"github.com/prusa3d/prusa-connect/sdk/extension"
 	"github.com/prusa3d/prusa-connect/sdk/moduledb"
 	"github.com/prusa3d/prusa-connect/sdk/routesapi"
+	"github.com/prusa3d/prusa-connect/sdk/storageapi"
 	"github.com/prusa3d/prusa-connect/sdk/wire"
 	"github.com/prusa3d/prusa-connect/sdk/wirerpc"
+
+	"github.com/singlergold2/maintenance/internal/gcode"
 )
 
 //go:embed module.yaml
@@ -108,8 +112,15 @@ type DeviceView struct {
 	Prints int     `json:"prints"`
 	// PrinterHours is what the machine's own display said, when the operator
 	// typed it in.
-	PrinterHours *float64   `json:"printer_hours,omitempty"`
-	Tasks        []TaskView `json:"tasks"`
+	PrinterHours *float64    `json:"printer_hours,omitempty"`
+	Tools        []ToolHours `json:"tools,omitempty"`
+	Tasks        []TaskView  `json:"tasks"`
+}
+
+// ToolHours is one tool of a printer and the hours it ran.
+type ToolHours struct {
+	Tool  int     `json:"tool"`
+	Hours float64 `json:"hours"`
 }
 
 // module is the state the routes read.
@@ -119,6 +130,7 @@ type module struct {
 	postgres bool
 	devices  *deviceapi.Client
 	bus      *busapi.Client
+	storage  *storageapi.Client
 	alert    int
 
 	notified map[string]string
@@ -173,6 +185,7 @@ func run() error {
 	state.mu.Lock()
 	state.devices = deviceapi.NewClient(conn)
 	state.bus = busapi.NewClient(conn)
+	state.storage = storageapi.NewClient(conn)
 	state.mu.Unlock()
 
 	fmt.Fprintf(os.Stderr, "%s %s is serving on stdio as pid %d\n", name, release, os.Getpid())
@@ -328,6 +341,23 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			counter = projected
 		}
 
+		if attributeErr := state.attributeTools(r.Context(), st, device.ID); attributeErr != nil {
+			fmt.Fprintf(os.Stderr, "%s: the tools of %s: %v\n", name, device.ID, attributeErr)
+		}
+
+		toolMap, toolsErr := st.ToolHours(r.Context(), device.ID)
+		if toolsErr != nil {
+			refuse(w, r, StoreFailed.New("the tool hours could not be read").With(faultString("reason", toolsErr.Error())))
+			return
+		}
+
+		tools := make([]ToolHours, 0, len(toolMap))
+		for tool, toolHours := range toolMap {
+			tools = append(tools, ToolHours{Tool: tool, Hours: round1(toolHours)})
+		}
+
+		sort.Slice(tools, func(i, j int) bool { return tools[i].Tool < tools[j].Tool })
+
 		deviceTasks := state.view(tasks, counter, time.Now())
 		state.announce(r.Context(), device.ID, device.Name, deviceTasks)
 
@@ -338,6 +368,7 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			Hours:        round1(hours),
 			Prints:       prints,
 			PrinterHours: typed,
+			Tools:        tools,
 			Tasks:        deviceTasks,
 		})
 	}
@@ -579,6 +610,119 @@ func handleDelete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	answer(w, http.StatusOK, map[string]any{"deleted": id})
+}
+
+const (
+	// toolFileLimit keeps a page responsive: a few files per load are read, the
+	// rest on the loads after it.
+	toolFileLimit = 3
+	maxToolFile   = 64 << 20
+)
+
+// attributeTools splits the length of the finished prints this module has not
+// read yet across the tools the G-code names. It reads at most a few files per
+// call, so a page stays quick and the older prints follow on later loads.
+func (m *module) attributeTools(ctx context.Context, st *store, deviceID string) error {
+	m.mu.Lock()
+	devices := m.devices
+	files := m.storage
+	m.mu.Unlock()
+
+	if devices == nil || files == nil {
+		return nil
+	}
+
+	read := 0
+	cursor := ""
+
+	for page := 0; page < 5 && read < toolFileLimit; page++ {
+		history, err := devices.JobHistory(ctx, deviceapi.JobHistoryParams{ID: deviceID, Limit: 50, Cursor: cursor})
+		if err != nil {
+			return err
+		}
+
+		for _, job := range history.Items {
+			if job.Ended == nil || job.Path == "" {
+				continue
+			}
+
+			seen, seenErr := st.JobSeen(ctx, deviceID, job.ID)
+			if seenErr != nil {
+				return seenErr
+			}
+
+			if seen {
+				continue
+			}
+
+			if read >= toolFileLimit {
+				return nil
+			}
+
+			read++
+
+			if splitErr := m.splitJob(ctx, st, files, deviceID, job); splitErr != nil {
+				fmt.Fprintf(os.Stderr, "%s: print %s: %v\n", name, job.ID, splitErr)
+			}
+		}
+
+		if history.Cursor == "" || history.Cursor == cursor {
+			break
+		}
+
+		cursor = history.Cursor
+	}
+
+	return nil
+}
+
+// splitJob reads one print's G-code and adds each tool's share of the print to
+// its counter. A file this module cannot read is marked seen all the same, so
+// the same broken file is not opened on every load.
+func (m *module) splitJob(ctx context.Context, st *store, files *storageapi.Client, deviceID string, job deviceapi.Job) error {
+	defer func() { _ = st.MarkJobSeen(ctx, deviceID, job.ID) }()
+
+	file, err := files.Open(ctx, storageapi.Target{Storage: "local", Path: job.Path})
+	if err != nil {
+		return err
+	}
+
+	if file.Size() > maxToolFile {
+		return fmt.Errorf("the file is %d bytes, larger than the %d this module reads", file.Size(), maxToolFile)
+	}
+
+	text, err := gcode.ReadAll(file, file.Size())
+	if err != nil {
+		return err
+	}
+
+	usage := gcode.Parse(text)
+	if usage.Lines == 0 {
+		return nil
+	}
+
+	var total float64
+	for _, millimetres := range usage.Extrusion {
+		total += millimetres
+	}
+
+	if total <= 0 || job.Ended == nil {
+		return nil
+	}
+
+	length := job.Ended.Sub(job.Started).Hours()
+	if length <= 0 {
+		return nil
+	}
+
+	for tool, millimetres := range usage.Extrusion {
+		share := length * millimetres / total
+		if err := st.AddToolHours(ctx, deviceID, tool, share); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (m *module) store() (*store, error) {

@@ -209,6 +209,73 @@ func (s *store) MarkSeeded(ctx context.Context, deviceID string) (bool, error) {
 	return rows == 1, nil
 }
 
+// JobSeen answers whether this print was already split across the tools.
+func (s *store) JobSeen(ctx context.Context, deviceID, jobID string) (bool, error) {
+	query := fmt.Sprintf(`SELECT 1 FROM maintenance_jobs_seen WHERE device_id = %s AND job_id = %s`,
+		s.place(1), s.place(2))
+
+	var one int
+	err := s.db.QueryRowContext(ctx, query, deviceID, jobID).Scan(&one)
+	if err == sql.ErrNoRows {
+		return false, nil
+	}
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (s *store) MarkJobSeen(ctx context.Context, deviceID, jobID string) error {
+	query := fmt.Sprintf(`INSERT INTO maintenance_jobs_seen (device_id, job_id, seen_at)
+        VALUES (%s, %s, %s) ON CONFLICT (device_id, job_id) DO NOTHING`,
+		s.place(1), s.place(2), s.place(3))
+
+	_, err := s.db.ExecContext(ctx, query, deviceID, jobID, nowText())
+
+	return err
+}
+
+// ToolHours is the hours each tool has run on one printer.
+func (s *store) ToolHours(ctx context.Context, deviceID string) (map[int]float64, error) {
+	query := fmt.Sprintf(`SELECT tool, hours FROM maintenance_tool_hours WHERE device_id = %s ORDER BY tool`, s.place(1))
+
+	rows, err := s.db.QueryContext(ctx, query, deviceID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	out := map[int]float64{}
+
+	for rows.Next() {
+		var (
+			tool  int
+			hours float64
+		)
+
+		if err := rows.Scan(&tool, &hours); err != nil {
+			return nil, err
+		}
+
+		out[tool] = hours
+	}
+
+	return out, rows.Err()
+}
+
+func (s *store) AddToolHours(ctx context.Context, deviceID string, tool int, hours float64) error {
+	query := fmt.Sprintf(`INSERT INTO maintenance_tool_hours (device_id, tool, hours, updated_at)
+        VALUES (%s, %s, %s, %s)
+        ON CONFLICT (device_id, tool) DO UPDATE SET hours = maintenance_tool_hours.hours + EXCLUDED.hours,
+        updated_at = EXCLUDED.updated_at`, s.place(1), s.place(2), s.place(3), s.place(4))
+
+	_, err := s.db.ExecContext(ctx, query, deviceID, tool, hours, nowText())
+
+	return err
+}
+
 func nullable(value string) any {
 	if value == "" {
 		return nil

@@ -153,6 +153,7 @@ export interface components {
             prints: number;
             tasks: components["schemas"]["TaskView"][];
             printer_hours?: number;
+            tools?: components["schemas"]["ToolHours"][];
         };
         TemplateTask: {
             id: string;
@@ -163,6 +164,10 @@ export interface components {
             interval_days?: number;
             material?: string;
             position?: number;
+        };
+        ToolHours: {
+            tool: number;
+            hours: number;
         };
     };
     responses: never;

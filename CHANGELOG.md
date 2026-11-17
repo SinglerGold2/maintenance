@@ -3,6 +3,17 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.10.0 - 2026-11-17
+
+### Added
+
+- The printer's Maintenance tab says how many hours each tool ran. The module
+  reads the G-code of a finished print once, both `.gcode` and `.bgcode`
+  (deflate, heatshrink 11/4 and 12/4, MeatPack with and without spaces), and
+  splits the print's length by the filament each tool pushed.
+- The module asks for `core-storage.stat` and `core-storage.fetch` to read a
+  print's file from the server's storage.
+
 ## 0.9.2 - 2026-11-17
 
 ### Fixed

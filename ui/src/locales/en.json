@@ -39,5 +39,7 @@
   "maintenance.cards.due.none": "Nothing is due. Every task is inside its interval.",
   "maintenance.cards.due.loading": "Reading the fleet\u2026",
   "maintenance.tab.waiting": "Reading this printer\u2026",
-  "maintenance.page.templateNote": "One schedule for every printer. Change an interval here and every printer's task of that name follows; its hours and Done stay on the printer's Maintenance tab."
+  "maintenance.page.templateNote": "One schedule for every printer. Change an interval here and every printer's task of that name follows; its hours and Done stay on the printer's Maintenance tab.",
+  "maintenance.tab.tools": "Print hours per tool",
+  "maintenance.tab.toolsHint": "Split by the filament each tool pushed, read from the G-code of the finished prints. Retractions count towards the tool that made them."
 }

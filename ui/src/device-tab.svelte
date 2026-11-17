@@ -155,6 +155,20 @@
       </div>
     </div>
 
+    {#if device.tools && device.tools.length > 0}
+      <div>
+        <h3 class="font-medium">{t('maintenance.tab.tools')}</h3>
+        <p class="text-neutral-600 text-sm">{t('maintenance.tab.toolsHint')}</p>
+        <ul class="mt-1 flex flex-wrap gap-3 text-sm">
+          {#each device.tools as tool (tool.tool)}
+            <li class="rounded border-neutral-200 border px-2 py-1">
+              T{tool.tool}: <strong>{hours(tool.hours)}</strong>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+
     <div class="flex flex-col gap-2">
       {#each device.tasks as task (task.id)}
         <div

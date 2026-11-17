@@ -128,6 +128,12 @@
           },
           "printer_hours": {
             "type": "number"
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ToolHours"
+            }
           }
         },
         "required": [
@@ -170,6 +176,21 @@
           "id",
           "name",
           "kind"
+        ]
+      },
+      "ToolHours": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "type": "integer"
+          },
+          "hours": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "tool",
+          "hours"
         ]
       }
     }
