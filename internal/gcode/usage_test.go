@@ -27,11 +27,23 @@ func TestParseCountsExtrusionPerTool(t *testing.T) {
 func TestParseReadsAbsoluteExtrusion(t *testing.T) {
 	t.Parallel()
 
-	text := []byte("M82\nG1 E10\nG1 E12\nG1 E12\nG1 E15\n")
+	text := []byte("M82\nG1 X1 E10\nG1 X2 E12\nG1 X3 E12\nG1 X4 E15\n")
 	usage := Parse(text)
 
 	if got := usage.Extrusion[0]; got != 15 {
 		t.Errorf("tool 0 pushed %v mm, want 15", got)
+	}
+}
+
+func TestParseIgnoresAPureExtrude(t *testing.T) {
+	t.Parallel()
+
+	// A retract and an unretract carry E alone; they use no filament the slicer
+	// counts.
+	text := []byte("M83\nG1 X1 E2\nG1 E-1\nG1 E1\nG1 X2 E3\n")
+
+	if got := Parse(text).Extrusion[0]; got != 5 {
+		t.Errorf("tool 0 pushed %v mm, want 5", got)
 	}
 }
 
