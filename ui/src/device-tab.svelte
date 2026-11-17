@@ -11,7 +11,12 @@
   } from '@prusa/connect-ui/primitives';
 
   import { heldHost } from './host';
-  import { maintenanceOn, type Overview, type Set, type TaskView } from './maintenance';
+  import {
+    maintenanceOn,
+    type Overview,
+    type Set,
+    type TaskView,
+  } from './maintenance';
 
   let { deviceId }: { deviceId: string } = $props();
 
@@ -167,6 +172,7 @@
         </SelectContent>
       </Select>
     </div>
+    <p class="text-neutral-500 -mt-2 text-sm">{t('maintenance.tab.setHint')}</p>
 
     <div>
       <p class="text-neutral-600 text-sm">

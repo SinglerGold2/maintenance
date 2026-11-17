@@ -157,7 +157,12 @@
 
   <Card>
     <CardContent>
-      <p class="text-neutral-600 text-sm">{t('maintenance.page.setsHint')}</p>
+      <div class="flex flex-col gap-2 text-sm">
+        <p>{t('maintenance.page.introWhat')}</p>
+        <p class="text-neutral-600">{t('maintenance.page.introHow')}</p>
+        <p class="text-neutral-600">{t('maintenance.page.introValues')}</p>
+        <p class="text-neutral-600">{t('maintenance.page.introNew')}</p>
+      </div>
 
       <div class="mt-3 flex flex-wrap items-end gap-2">
         <Input
@@ -205,6 +210,16 @@
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
             <span class="font-medium">{set.name}</span>
+            {#if set.kb_url}
+              <a
+                class="text-neutral-500 ml-2 text-sm underline"
+                href={set.kb_url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t('maintenance.page.kb')}
+              </a>
+            {/if}
             <span class="text-neutral-500 ml-2 text-sm">
               {set.model === '*' ? t('maintenance.page.anyModel') : set.model}
               {#if set.builtin}· {t('maintenance.page.builtin')}{/if}
@@ -257,7 +272,7 @@
           <div class="mt-3 flex flex-col gap-2">
             {#each set.tasks as task (task.id)}
               <div
-                class="border-neutral-200 flex flex-wrap items-center gap-2 border-t pt-2"
+                class="border-neutral-200 flex items-center justify-between gap-2 border-t pt-2"
               >
                 <span class="text-sm">{task.name}</span>
                 <span class="text-neutral-500 text-sm">

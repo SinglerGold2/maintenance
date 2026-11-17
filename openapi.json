@@ -930,6 +930,9 @@
             "items": {
               "$ref": "#/components/schemas/SetTask"
             }
+          },
+          "kb_url": {
+            "type": "string"
           }
         },
         "required": [

@@ -319,6 +319,7 @@ export interface components {
             builtin?: boolean;
             enabled?: boolean;
             tasks: components["schemas"]["SetTask"][];
+            kb_url?: string;
         };
     };
     responses: never;

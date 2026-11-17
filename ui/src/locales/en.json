@@ -59,5 +59,11 @@
   "maintenance.page.taskName": "Task",
   "maintenance.page.hours": "hours",
   "maintenance.page.addTask": "Add task",
-  "maintenance.tab.set": "Schedule"
+  "maintenance.tab.set": "Schedule",
+  "maintenance.page.introWhat": "Maintenance counts the print hours of every printer and reminds you when a task is due. Every printer keeps its own counter and its own Done marks; this page decides which tasks it has.",
+  "maintenance.page.introHow": "A printer follows the schedule its model brings until you pick another one in the Schedule field on its Maintenance tab. The shipped schedules can be switched off, and their intervals can only be changed in a copy; duplicate one, edit the copy, and assign it.",
+  "maintenance.page.introValues": "The shipped intervals are the ones in the Prusa Knowledge Base, and each schedule links to the article it came from. Your own values belong in a copy you make here.",
+  "maintenance.page.introNew": "Name of the new schedule creates your own: give it a name, pick the printer model it is meant for, press New schedule, then open it and add the tasks you want, in print hours or in days. A schedule that counts days is how you ask for a check every three months no matter how much the printer runs.",
+  "maintenance.page.kb": "Knowledge Base",
+  "maintenance.tab.setHint": "Which schedule this printer follows. A shipped schedule holds the Prusa Knowledge Base intervals; a copy of it is where you change them."
 }

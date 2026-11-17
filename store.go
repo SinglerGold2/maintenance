@@ -328,12 +328,15 @@ func nullable(value string) any {
 // it points at, so one printer can run quarterly checks while another follows
 // the shipped schedule.
 type Set struct {
-	ID      string    `json:"id"`
-	Name    string    `json:"name"`
-	Model   string    `json:"model"`
-	Builtin bool      `json:"builtin"`
-	Enabled bool      `json:"enabled"`
-	Tasks   []SetTask `json:"tasks"`
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Model   string `json:"model"`
+	Builtin bool   `json:"builtin"`
+	Enabled bool   `json:"enabled"`
+	// KBURL is the Knowledge Base article this schedule was read from, when
+	// there is one.
+	KBURL string    `json:"kb_url,omitempty"`
+	Tasks []SetTask `json:"tasks"`
 }
 
 // SetTask is one line of a set, before any printer has run it.
@@ -348,7 +351,7 @@ type SetTask struct {
 
 // Sets lists every schedule with its lines.
 func (s *store) Sets(ctx context.Context) ([]Set, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, name, model, builtin, enabled FROM maintenance_sets ORDER BY position, name`)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, name, model, builtin, enabled, kb_url FROM maintenance_sets ORDER BY position, name`)
 	if err != nil {
 		return nil, err
 	}
@@ -364,7 +367,7 @@ func (s *store) Sets(ctx context.Context) ([]Set, error) {
 			enabled int
 		)
 
-		if err := rows.Scan(&set.ID, &set.Name, &set.Model, &builtin, &enabled); err != nil {
+		if err := rows.Scan(&set.ID, &set.Name, &set.Model, &builtin, &enabled, &set.KBURL); err != nil {
 			return nil, err
 		}
 
@@ -418,7 +421,7 @@ func (s *store) SetTasks(ctx context.Context, setID string) ([]SetTask, error) {
 func (s *store) CreateSet(ctx context.Context, name, model, copyOf string) (Set, error) {
 	set := Set{ID: newID(), Name: name, Model: model, Enabled: true, Tasks: []SetTask{}}
 
-	query := fmt.Sprintf(`INSERT INTO maintenance_sets (id, name, model, builtin, enabled, position) VALUES (%s, %s, %s, 0, 1, (SELECT COALESCE(MAX(position), 0) + 1 FROM maintenance_sets))`,
+	query := fmt.Sprintf(`INSERT INTO maintenance_sets (id, name, model, builtin, enabled, kb_url, position) VALUES (%s, %s, %s, 0, 1, '', (SELECT COALESCE(MAX(position), 0) + 1 FROM maintenance_sets))`,
 		s.place(1), s.place(2), s.place(3))
 
 	if _, err := s.db.ExecContext(ctx, query, set.ID, set.Name, set.Model); err != nil {
