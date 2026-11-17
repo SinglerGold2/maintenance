@@ -30,6 +30,7 @@
   let pendingDone = $state<TaskView | undefined>();
   let pendingToolReset = $state<number | undefined>();
   let sets = $state<Set[]>([]);
+  let failed = $state('');
 
   const device = $derived(
     overview?.devices.find((entry) => entry.id === deviceId),
@@ -38,9 +39,19 @@
   async function load(): Promise<void> {
     try {
       overview = await api.overview(host.signal);
+      failed = '';
+    } catch (error) {
+      overview = undefined;
+      failed = String(error);
+      return;
+    }
+
+    // The schedule list is a convenience: when it cannot be read, the printer's
+    // own page still has to show its hours and tasks.
+    try {
       sets = (await api.sets(host.signal)).sets;
     } catch {
-      overview = undefined;
+      sets = [];
     }
   }
 
@@ -150,6 +161,9 @@
 
 {#if device === undefined}
   <p class="text-neutral-600 text-sm">{t('maintenance.tab.waiting')}</p>
+  {#if failed !== ''}
+    <p class="text-xs">{failed}</p>
+  {/if}
 {:else}
   <div class="flex flex-col gap-4">
     <div class="text-neutral-600 flex items-center gap-2 text-sm">

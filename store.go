@@ -596,11 +596,21 @@ func (s *store) SyncSetTasks(ctx context.Context, deviceID, setID string, now ti
 
 		current, found := byName[line.Name]
 		if !found {
+			// A set names a nozzle line by its material; the printer's own task
+			// only carries the interval that material gives.
+			kind := line.Kind
+			if kind == "nozzle" {
+				kind = "hours"
+				if line.IntervalDays > 0 {
+					kind = "days"
+				}
+			}
+
 			insert := Task{
 				ID:            newID(),
 				DeviceID:      deviceID,
 				Name:          line.Name,
-				Kind:          line.Kind,
+				Kind:          kind,
 				IntervalHours: line.IntervalHours,
 				IntervalDays:  line.IntervalDays,
 				Material:      line.Material,
@@ -615,12 +625,19 @@ func (s *store) SyncSetTasks(ctx context.Context, deviceID, setID string, now ti
 			continue
 		}
 
-		if current.Kind == line.Kind && current.IntervalHours == line.IntervalHours &&
+		if current.Kind == line.Kind && current.Kind != "nozzle" && current.IntervalHours == line.IntervalHours &&
 			current.IntervalDays == line.IntervalDays && current.Material == line.Material {
 			continue
 		}
 
 		current.Kind = line.Kind
+		if current.Kind == "nozzle" {
+			current.Kind = "hours"
+			if line.IntervalDays > 0 {
+				current.Kind = "days"
+			}
+		}
+
 		current.IntervalHours = line.IntervalHours
 		current.IntervalDays = line.IntervalDays
 		current.Material = line.Material
