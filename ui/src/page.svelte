@@ -32,7 +32,6 @@
   let edits = $state<
     Record<string, { interval: number | undefined; material: string }>
   >({});
-  let printerDrafts = $state<Record<string, string>>({});
   let pendingDone = $state<TaskView | undefined>();
 
   function draftAt(deviceID: string): {
@@ -53,16 +52,6 @@
           task.kind === 'hours' ? task.interval_hours : task.interval_days,
         material: task.material ?? '',
       }
-    );
-  }
-
-  function printerDraftAt(device: {
-    id: string;
-    printer_hours?: number;
-  }): string {
-    return (
-      printerDrafts[device.id] ??
-      (device.printer_hours === undefined ? '' : String(device.printer_hours))
     );
   }
 
@@ -118,31 +107,6 @@
 
   // parseHours reads what a person types for the printer's own counter: 343,
   // 343h, 14d 7h, 14d7h, 2w 1d 3h. It answers NaN for what it cannot read.
-  function parseHours(text: string): number {
-    const pattern = /(\d+(?:[.,]\d+)?)\s*([wdh])/g;
-    let total = 0;
-    let matched = false;
-    let match = pattern.exec(text.toLowerCase());
-
-    while (match !== null) {
-      const value = Number(match[1]?.replace(',', '.') ?? '0');
-      const unit = match[2];
-
-      if (unit === 'w') total += value * 7 * 24;
-      if (unit === 'd') total += value * 24;
-      if (unit === 'h') total += value;
-
-      matched = true;
-      match = pattern.exec(text.toLowerCase());
-    }
-
-    if (matched) return total;
-
-    const plain = Number(text.trim().replace(',', '.'));
-
-    return Number.isFinite(plain) ? plain : Number.NaN;
-  }
-
   function intervalText(task: TaskView): string {
     if (kindOf(task) === 'hours') return hours(num(task.interval_hours));
 
@@ -204,17 +168,6 @@
     });
   }
 
-  function savePrinterHours(deviceID: string): void {
-    const typed = parseHours(printerDraftAt({ id: deviceID }));
-
-    if (!Number.isFinite(typed) || typed < 0) return;
-
-    void act(async () => {
-      await api.savePrinterHours(deviceID, typed);
-      printerDrafts[deviceID] = '';
-    });
-  }
-
   function add(deviceID: string): void {
     const draft = drafts[deviceID];
     if (draft === undefined) return;
@@ -269,226 +222,148 @@
           <div class="flex flex-col gap-3">
             <div>
               <h2 class="text-lg font-semibold">{nameOf(device)}</h2>
-              <p class="text-neutral-600 text-sm">
-                {t('maintenance.page.printed')}:
-                <strong>{hours(device.hours)}</strong>
-                ·
-                {t('maintenance.page.prints')}:
-                {device.prints}
-              </p>
-              {#if device.printer_hours !== undefined}
-                <p class="text-neutral-600 text-sm">
-                  {t('maintenance.page.printerSays')}:
-                  <strong>{hours(device.printer_hours)}</strong>
-                  ·
-                  {t('maintenance.page.serverTracked')}:
-                  {hours(device.hours)}
-                </p>
-              {/if}
-              <div class="mt-2 flex flex-wrap items-center gap-2">
-                <Input
-                  value={printerDraftAt(device)}
-                  placeholder={t('maintenance.page.printerHoursPlaceholder')}
-                  aria-label={t('maintenance.page.printerHours')}
-                  class="w-40"
-                  oninput={(event: Event) => {
-                    const target =
-                      event.currentTarget as HTMLInputElement | null;
-                    if (target !== null)
-                      printerDrafts[device.id] = target.value;
-                  }}
-                />
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  disabled={busy}
-                  onclick={() => savePrinterHours(device.id)}
-                >
-                  {t('maintenance.page.save')}
-                </Button>
-                <span class="text-neutral-500 text-xs">
-                  {t('maintenance.page.printerHoursHint')}
-                </span>
-              </div>
-            </div>
-
-            <div class="flex flex-col gap-3">
-              {#each device.tasks as task (task.id)}
-                {@const edit = editAt(task)}
-                <div
-                  class="border-neutral-200 flex flex-col gap-2 border-t pt-3"
-                >
-                  <div class="flex flex-wrap items-start justify-between gap-2">
-                    <div>
-                      <div class="font-medium">{task.name}</div>
-                      <div class="text-neutral-600 text-sm">
-                        <div class="flex flex-wrap items-center gap-2">
-                          <Input
-                            type="number"
-                            min="1"
-                            value={edit.interval}
-                            aria-label={t('maintenance.page.interval')}
-                            class="w-24"
-                            oninput={(event: Event) => {
-                              const target =
-                                event.currentTarget as HTMLInputElement | null;
-                              if (target !== null) {
-                                edits[task.id] = {
-                                  ...edit,
-                                  interval: target.valueAsNumber,
-                                };
-                              }
-                            }}
-                          />
-                          <Button
-                            size="sm"
-                            disabled={busy}
-                            onclick={() => saveTask(device.id, task)}
-                          >
-                            {t('maintenance.page.save')}
-                          </Button>
+              <div class="flex flex-col gap-3">
+                {#each device.tasks as task (task.id)}
+                  {@const edit = editAt(task)}
+                  <div
+                    class="border-neutral-200 flex flex-col gap-2 border-t pt-3"
+                  >
+                    <div
+                      class="flex flex-wrap items-start justify-between gap-2"
+                    >
+                      <div>
+                        <div class="font-medium">{task.name}</div>
+                        <div class="text-neutral-600 text-sm">
+                          <div class="flex flex-wrap items-center gap-2">
+                            <Input
+                              type="number"
+                              min="1"
+                              value={edit.interval}
+                              aria-label={t('maintenance.page.interval')}
+                              class="w-24"
+                              oninput={(event: Event) => {
+                                const target =
+                                  event.currentTarget as HTMLInputElement | null;
+                                if (target !== null) {
+                                  edits[task.id] = {
+                                    ...edit,
+                                    interval: target.valueAsNumber,
+                                  };
+                                }
+                              }}
+                            />
+                            <Button
+                              size="sm"
+                              disabled={busy}
+                              onclick={() => saveTask(device.id, task)}
+                            >
+                              {t('maintenance.page.save')}
+                            </Button>
+                          </div>
+                          {t('maintenance.page.every')}
+                          {intervalText(task)}
+                          · {t('maintenance.page.sinceLast')}
+                          {sinceText(task)}
+                          · {t('maintenance.page.dueAt')}
+                          {thresholdText(task, overview.alert_percent)}
                         </div>
-                        {t('maintenance.page.every')}
-                        {intervalText(task)}
-                        · {t('maintenance.page.sinceLast')}
-                        {sinceText(task)}
-                        · {t('maintenance.page.dueAt')}
-                        {thresholdText(task, overview.alert_percent)}
                       </div>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2">
-                      <span class="text-sm font-semibold {statusColor(task)}">
-                        {statusText(task)}
-                      </span>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        disabled={busy}
-                        onclick={() => (pendingDone = task)}
-                      >
-                        {t('maintenance.page.done')}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        disabled={busy}
-                        onclick={() => resetTask(device.id, task)}
-                      >
-                        {t('maintenance.page.reset')}
-                      </Button>
-                      {#if !task.builtin}
+                      <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-sm font-semibold {statusColor(task)}">
+                          {statusText(task)}
+                        </span>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          disabled={busy}
+                          onclick={() => (pendingDone = task)}
+                        >
+                          {t('maintenance.page.done')}
+                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"
                           disabled={busy}
-                          onclick={() =>
-                            void act(() => api.deleteTask(task.id))}
+                          onclick={() => resetTask(device.id, task)}
                         >
-                          {t('maintenance.page.remove')}
+                          {t('maintenance.page.reset')}
                         </Button>
-                      {/if}
+                        {#if !task.builtin}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={busy}
+                            onclick={() =>
+                              void act(() => api.deleteTask(task.id))}
+                          >
+                            {t('maintenance.page.remove')}
+                          </Button>
+                        {/if}
+                      </div>
                     </div>
                   </div>
+                {/each}
+              </div>
 
-                  {#if task.material}
-                    <div class="flex flex-wrap items-center gap-2">
-                      <Input
-                        type="number"
-                        min="1"
-                        value={edit.interval}
-                        aria-label={t('maintenance.page.interval')}
-                        class="w-24"
-                        oninput={(event: Event) => {
-                          const target =
-                            event.currentTarget as HTMLInputElement | null;
-                          if (target !== null) {
-                            edits[task.id] = {
-                              ...edit,
-                              interval: target.valueAsNumber,
-                            };
-                          }
-                        }}
-                      />
-                      <Input
-                        value={edit.material}
-                        placeholder={t('maintenance.page.materialPlaceholder')}
-                        aria-label={t('maintenance.page.material')}
-                        class="w-48"
-                        oninput={(event: Event) => {
-                          const target =
-                            event.currentTarget as HTMLInputElement | null;
-                          if (target !== null) {
-                            edits[task.id] = {
-                              ...edit,
-                              material: target.value,
-                            };
-                          }
-                        }}
-                      />
-                      <Button
-                        size="sm"
-                        disabled={busy}
-                        onclick={() => saveTask(device.id, task)}
-                      >
-                        {t('maintenance.page.save')}
-                      </Button>
-                    </div>
-                  {/if}
-                </div>
-              {/each}
-            </div>
-
-            <div
-              class="border-neutral-200 flex flex-wrap items-end gap-2 border-t pt-3"
-            >
-              <Input
-                value={draft.name}
-                placeholder={t('maintenance.page.taskPlaceholder')}
-                aria-label={t('maintenance.page.task')}
-                class="max-w-xs"
-                oninput={(event: Event) => {
-                  const target = event.currentTarget as HTMLInputElement | null;
-                  if (target !== null)
-                    drafts[device.id] = { ...draft, name: target.value };
-                }}
-              />
-              <Input
-                type="number"
-                min="1"
-                value={draft.interval}
-                aria-label={t('maintenance.page.interval')}
-                class="w-24"
-                oninput={(event: Event) => {
-                  const target = event.currentTarget as HTMLInputElement | null;
-                  if (target !== null) {
-                    drafts[device.id] = {
-                      ...draft,
-                      interval: target.valueAsNumber,
-                    };
-                  }
-                }}
-              />
-              <Button
-                variant={draft.kind === 'hours' ? 'default' : 'secondary'}
-                size="sm"
-                onclick={() =>
-                  (drafts[device.id] = { ...draft, kind: 'hours' })}
+              <div
+                class="border-neutral-200 flex flex-wrap items-end gap-2 border-t pt-3"
               >
-                {t('maintenance.page.hoursUnit')}
-              </Button>
-              <Button
-                variant={draft.kind === 'days' ? 'default' : 'secondary'}
-                size="sm"
-                onclick={() => (drafts[device.id] = { ...draft, kind: 'days' })}
-              >
-                {t('maintenance.page.daysUnit')}
-              </Button>
-              <Button size="sm" disabled={busy} onclick={() => add(device.id)}>
-                {t('maintenance.page.addButton')}
-              </Button>
+                <Input
+                  value={draft.name}
+                  placeholder={t('maintenance.page.taskPlaceholder')}
+                  aria-label={t('maintenance.page.task')}
+                  class="max-w-xs"
+                  oninput={(event: Event) => {
+                    const target =
+                      event.currentTarget as HTMLInputElement | null;
+                    if (target !== null)
+                      drafts[device.id] = { ...draft, name: target.value };
+                  }}
+                />
+                <Input
+                  type="number"
+                  min="1"
+                  value={draft.interval}
+                  aria-label={t('maintenance.page.interval')}
+                  class="w-24"
+                  oninput={(event: Event) => {
+                    const target =
+                      event.currentTarget as HTMLInputElement | null;
+                    if (target !== null) {
+                      drafts[device.id] = {
+                        ...draft,
+                        interval: target.valueAsNumber,
+                      };
+                    }
+                  }}
+                />
+                <Button
+                  variant={draft.kind === 'hours' ? 'default' : 'secondary'}
+                  size="sm"
+                  onclick={() =>
+                    (drafts[device.id] = { ...draft, kind: 'hours' })}
+                >
+                  {t('maintenance.page.hoursUnit')}
+                </Button>
+                <Button
+                  variant={draft.kind === 'days' ? 'default' : 'secondary'}
+                  size="sm"
+                  onclick={() =>
+                    (drafts[device.id] = { ...draft, kind: 'days' })}
+                >
+                  {t('maintenance.page.daysUnit')}
+                </Button>
+                <Button
+                  size="sm"
+                  disabled={busy}
+                  onclick={() => add(device.id)}
+                >
+                  {t('maintenance.page.addButton')}
+                </Button>
+              </div>
             </div>
-          </div>
-        </CardContent>
+          </div></CardContent
+        >
       </Card>
     {/each}
   {/if}
