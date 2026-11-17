@@ -24,6 +24,7 @@ import (
 	_ "github.com/lib/pq"
 	_ "modernc.org/sqlite"
 
+	"github.com/prusa3d/prusa-connect/sdk/busapi"
 	"github.com/prusa3d/prusa-connect/sdk/deviceapi"
 	"github.com/prusa3d/prusa-connect/sdk/extension"
 	"github.com/prusa3d/prusa-connect/sdk/moduledb"
@@ -117,7 +118,10 @@ type module struct {
 	db       *sql.DB
 	postgres bool
 	devices  *deviceapi.Client
+	bus      *busapi.Client
 	alert    int
+
+	notified map[string]string
 
 	cacheMu sync.Mutex
 	cache   map[string]hoursEntry
@@ -168,6 +172,7 @@ func run() error {
 
 	state.mu.Lock()
 	state.devices = deviceapi.NewClient(conn)
+	state.bus = busapi.NewClient(conn)
 	state.mu.Unlock()
 
 	fmt.Fprintf(os.Stderr, "%s %s is serving on stdio as pid %d\n", name, release, os.Getpid())
@@ -180,7 +185,11 @@ func run() error {
 }
 
 //nolint:gochecknoglobals // the one piece of state this module has.
-var state = &module{alert: defaultAlertPercent, cache: map[string]hoursEntry{}}
+var state = &module{
+	alert:    defaultAlertPercent,
+	cache:    map[string]hoursEntry{},
+	notified: map[string]string{},
+}
 
 func methods() wirerpc.Methods {
 	return wirerpc.Methods{
@@ -311,6 +320,9 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			counter = projected
 		}
 
+		deviceTasks := state.view(tasks, counter, time.Now())
+		state.announce(r.Context(), device.ID, device.Name, deviceTasks)
+
 		views = append(views, DeviceView{
 			ID:           device.ID,
 			Name:         device.Name,
@@ -318,7 +330,7 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			Hours:        round1(hours),
 			Prints:       prints,
 			PrinterHours: typed,
-			Tasks:        state.view(tasks, counter, time.Now()),
+			Tasks:        deviceTasks,
 		})
 	}
 
@@ -677,6 +689,42 @@ func defaultsFor(model, deviceID string, now time.Time) []Task {
 		{ID: newID(), DeviceID: deviceID, Builtin: true, Name: "Inspect the electrical connectors", Kind: "hours", IntervalHours: 600, LastDoneAt: stamp},
 		{ID: newID(), DeviceID: deviceID, Builtin: true, Name: "Lubricate the linear rail", Kind: "days", IntervalDays: 90, LastDoneAt: stamp},
 		{ID: newID(), DeviceID: deviceID, Builtin: true, Name: "Check the nozzle, replace when worn", Kind: "hours", IntervalHours: 5000, LastDoneAt: stamp, Material: "hardened steel"},
+	}
+}
+
+// announce sends one event when a task reaches due soon or due. The state is
+// remembered, so a page that reloads ten times announces once.
+func (m *module) announce(ctx context.Context, deviceID, deviceName string, tasks []TaskView) {
+	m.mu.Lock()
+	bus := m.bus
+	m.mu.Unlock()
+
+	if bus == nil {
+		return
+	}
+
+	for _, task := range tasks {
+		key := deviceID + "/" + task.ID
+
+		last := m.notified[key]
+		if last == task.Status {
+			continue
+		}
+
+		m.notified[key] = task.Status
+		if task.Status != "due" && task.Status != "soon" {
+			continue
+		}
+
+		_ = bus.Emit(ctx, "maintenance", key, map[string]any{
+			"device_id":   deviceID,
+			"device_name": deviceName,
+			"task_id":     task.ID,
+			"task_name":   task.Name,
+			"status":      task.Status,
+			"percent":     task.Percent,
+			"material":    task.Material,
+		})
 	}
 }
 

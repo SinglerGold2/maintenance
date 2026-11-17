@@ -15,7 +15,7 @@ name: maintenance
 # which is what a module with a process needs. The browser half is declared
 # beside it, as `service.assets`.
 kind: sink
-version: 0.5.1
+version: 0.6.0
 # The licence this module is released under, required. Free text of at most
 # 200 characters; an SPDX identifier is the usual form. Operators read it on
 # the marketplace before they install. Change it to yours.
@@ -82,7 +82,8 @@ needs:
 permissions:
   # read the fleet and the print history the hours come from
   - observe
-#   changed: hello.changed
+events:
+  maintenance: maintenance.task
 
 ui:
   # The built bundle's entry, relative to the bundle root. The host serves it
