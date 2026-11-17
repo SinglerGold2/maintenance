@@ -47,10 +47,10 @@ The marketplace is the normal way. To install a release yourself:
 
 ```bash
 # the signed bundle from the GitHub release
-docker cp maintenance-0.10.19.tar.gz prusa-connect-local:/tmp/
+docker cp maintenance-0.10.20.tar.gz prusa-connect-local:/tmp/
 docker exec -w /app prusa-connect-local /app/prusa_connect_local \
-  module add github.com/singlergold2/maintenance@0.10.19 \
-  -from /tmp/maintenance-0.10.19.tar.gz -approve -database sqlite
+  module add github.com/singlergold2/maintenance@0.10.20 \
+  -from /tmp/maintenance-0.10.20.tar.gz -approve -database sqlite
 docker restart prusa-connect-local
 ```
 
@@ -64,8 +64,8 @@ release:
 
 ```powershell
 cd C:\prusa-connect
-.\prusa_connect_windows_amd64.exe module add github.com/singlergold2/maintenance@0.10.19 `
-  -from C:\Users\you\Downloads\maintenance-0.10.19.tar.gz -approve -database sqlite
+.\prusa_connect_windows_amd64.exe module add github.com/singlergold2/maintenance@0.10.20 `
+  -from C:\Users\you\Downloads\maintenance-0.10.20.tar.gz -approve -database sqlite
 ```
 
 Then restart the server. It unpacks the bundle into
@@ -78,8 +78,8 @@ folder the server runs from (the one with `config/` in it):
 
 ```bash
 cd ~/prusa-connect
-./prusa_connect_macos_arm64 module add github.com/singlergold2/maintenance@0.10.19 \
-  -from ~/Downloads/maintenance-0.10.19.tar.gz -approve -database sqlite
+./prusa_connect_macos_arm64 module add github.com/singlergold2/maintenance@0.10.20 \
+  -from ~/Downloads/maintenance-0.10.20.tar.gz -approve -database sqlite
 ```
 
 Then restart the server; it unpacks the bundle into
