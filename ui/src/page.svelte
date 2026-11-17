@@ -26,6 +26,7 @@
   interface Model {
     value: string;
     label: string;
+    abrasiveSafe?: boolean;
   }
 
   let sets = $state<Set[]>([]);
@@ -51,6 +52,8 @@
     { value: 'M3', label: 'M3' },
   ];
 
+  // Ordered by how long each material lasts, shortest first. The ones a
+  // carbon or glass filled filament eats through are marked.
   const nozzleMaterials: Model[] = [
     { value: 'brass', label: t('maintenance.page.materialBrass') },
     {
@@ -64,17 +67,28 @@
     {
       value: 'hardened steel',
       label: t('maintenance.page.materialHardenedSteel'),
+      abrasiveSafe: true,
     },
-    { value: 'bimetal', label: t('maintenance.page.materialBimetal') },
+    {
+      value: 'bimetal',
+      label: t('maintenance.page.materialBimetal'),
+      abrasiveSafe: true,
+    },
     {
       value: 'silicon carbide',
       label: t('maintenance.page.materialSiliconCarbide'),
+      abrasiveSafe: true,
     },
     {
       value: 'tungsten carbide',
       label: t('maintenance.page.materialTungstenCarbide'),
+      abrasiveSafe: true,
     },
-    { value: 'ruby/diamond', label: t('maintenance.page.materialRubyDiamond') },
+    {
+      value: 'ruby/diamond',
+      label: t('maintenance.page.materialRubyDiamond'),
+      abrasiveSafe: true,
+    },
   ];
 
   const kinds: Model[] = [
@@ -324,7 +338,12 @@
                     >
                       <div class="mt-1 flex flex-wrap gap-3">
                         {#each nozzleMaterials as material (material.value)}
-                          <span class="flex items-center gap-1">
+                          <span
+                            class="rounded flex items-center gap-1 px-1 {material.abrasiveSafe ===
+                            true
+                              ? ''
+                              : 'bg-red-500/15'}"
+                          >
                             <RadioGroupItem
                               value={material.value}
                               id={`${task.id ?? set.id}-${material.value}`}
@@ -339,6 +358,9 @@
                         {/each}
                       </div>
                     </RadioGroup>
+                    <p class="text-neutral-500 mt-1 text-xs">
+                      {t('maintenance.page.abrasiveHint')}
+                    </p>
                   {/if}
                 </div>
                 <span class="text-neutral-500 ml-auto text-sm">
