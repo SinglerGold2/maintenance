@@ -1,7 +1,6 @@
 {
   "_meta.language": "English",
   "_meta.note": "This module's own texts. The host reads this file from locales/en.json beside the bundle's entry and merges it under the module's namespace. Copy it to <tag>.json to translate.",
-
   "maintenance.page.title": "Maintenance",
   "maintenance.page.empty": "No printer is registered yet, so there is nothing to maintain.",
   "maintenance.page.printed": "Printed so far",
@@ -27,5 +26,10 @@
   "maintenance.page.hoursUnit": "Print hours",
   "maintenance.page.daysUnit": "Days",
   "maintenance.page.days": "Days",
-  "maintenance.page.addButton": "Add"
+  "maintenance.page.addButton": "Add",
+  "maintenance.page.printerSays": "The printer shows",
+  "maintenance.page.serverTracked": "the server tracked",
+  "maintenance.page.printerHours": "Printer hours",
+  "maintenance.page.printerHoursPlaceholder": "Hours from the printer",
+  "maintenance.page.printerHoursHint": "Read the counter on the printer itself, then type it here, so the totals match your machine."
 }

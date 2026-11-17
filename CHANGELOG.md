@@ -3,6 +3,15 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.3.0 - 2026-11-17
+
+### Added
+
+- A printer's card tells the two counters apart: what the server tracked and
+  what the machine's own display shows. The operator types the machine's number
+  in, with a hint saying to read it off the printer.
+- `POST /devices/hours` stores the count the operator read off the printer.
+
 ## 0.2.0 - 2026-11-17
 
 ### Added

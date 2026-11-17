@@ -119,6 +119,9 @@
             "items": {
               "$ref": "#/components/schemas/TaskView"
             }
+          },
+          "printer_hours": {
+            "type": "number"
           }
         },
         "required": [
@@ -137,6 +140,59 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/modules/com.github.aux.singlergold2.maintenance/devices/hours": {
+      "post": {
+        "operationId": "save-printer-hours",
+        "summary": "Record the print hours the machine's own display shows",
+        "description": "The server only sees the prints it recorded. This stores the count the operator read off the printer, so the page can tell the two apart.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "device_id": {
+                    "type": "string"
+                  },
+                  "hours": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "device_id",
+                  "hours"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The value that was stored.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "device_id": {
+                      "type": "string"
+                    },
+                    "hours": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "device_id",
+                    "hours"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/modules/com.github.aux.singlergold2.maintenance/overview": {
       "get": {
         "operationId": "read-overview",

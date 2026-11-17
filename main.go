@@ -99,12 +99,15 @@ type TaskView struct {
 
 // DeviceView is one printer with its hours and tasks.
 type DeviceView struct {
-	ID     string     `json:"id"`
-	Name   string     `json:"name"`
-	Model  string     `json:"model"`
-	Hours  float64    `json:"hours"`
-	Prints int        `json:"prints"`
-	Tasks  []TaskView `json:"tasks"`
+	ID     string  `json:"id"`
+	Name   string  `json:"name"`
+	Model  string  `json:"model"`
+	Hours  float64 `json:"hours"`
+	Prints int     `json:"prints"`
+	// PrinterHours is what the machine's own display said, when the operator
+	// typed it in.
+	PrinterHours *float64   `json:"printer_hours,omitempty"`
+	Tasks        []TaskView `json:"tasks"`
 }
 
 // module is the state the routes read.
@@ -227,6 +230,7 @@ func routes() http.Handler {
 	mux.HandleFunc("POST /tasks", handleSaveTask)
 	mux.HandleFunc("POST /tasks/done", handleDone)
 	mux.HandleFunc("DELETE /tasks", handleDelete)
+	mux.HandleFunc("POST /devices/hours", handlePrinterHours)
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		refuse(w, r, RouteNotFound.
@@ -273,13 +277,25 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+		printerHours, known, hoursErr := st.PrinterHours(r.Context(), device.ID)
+		if hoursErr != nil {
+			refuse(w, r, StoreFailed.New("the printer's own hours could not be read").With(faultString("reason", hoursErr.Error())))
+			return
+		}
+
+		var typed *float64
+		if known {
+			typed = &printerHours
+		}
+
 		views = append(views, DeviceView{
-			ID:     device.ID,
-			Name:   device.Name,
-			Model:  device.Model,
-			Hours:  round1(hours),
-			Prints: prints,
-			Tasks:  state.view(tasks, hours, time.Now()),
+			ID:           device.ID,
+			Name:         device.Name,
+			Model:        device.Model,
+			Hours:        round1(hours),
+			Prints:       prints,
+			PrinterHours: typed,
+			Tasks:        state.view(tasks, hours, time.Now()),
 		})
 	}
 
@@ -287,10 +303,10 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 }
 
 type saveRequest struct {
-	ID            string  `json:"id"`
-	DeviceID      string  `json:"device_id"`
-	Name          string  `json:"name"`
-	Kind          string  `json:"kind"`
+	ID            string   `json:"id"`
+	DeviceID      string   `json:"device_id"`
+	Name          string   `json:"name"`
+	Kind          string   `json:"kind"`
 	IntervalHours float64  `json:"interval_hours"`
 	IntervalDays  int      `json:"interval_days"`
 	Material      string   `json:"material"`
@@ -394,6 +410,36 @@ func handleDone(w http.ResponseWriter, r *http.Request) {
 	}
 
 	answer(w, http.StatusOK, task)
+}
+
+func handlePrinterHours(w http.ResponseWriter, r *http.Request) {
+	st, err := state.store()
+	if err != nil {
+		refuse(w, r, NoDatabase.New("this instance has no database"))
+		return
+	}
+
+	var sent struct {
+		DeviceID string  `json:"device_id"`
+		Hours    float64 `json:"hours"`
+	}
+
+	if decodeErr := json.NewDecoder(r.Body).Decode(&sent); decodeErr != nil || sent.DeviceID == "" {
+		refuse(w, r, InvalidInput.New("the request names no printer"))
+		return
+	}
+
+	if sent.Hours < 0 {
+		refuse(w, r, InvalidInput.New("hours cannot be negative"))
+		return
+	}
+
+	if storeErr := st.SetPrinterHours(r.Context(), sent.DeviceID, sent.Hours); storeErr != nil {
+		refuse(w, r, StoreFailed.New("the printer's own hours could not be written").With(faultString("reason", storeErr.Error())))
+		return
+	}
+
+	answer(w, http.StatusOK, map[string]any{"device_id": sent.DeviceID, "hours": sent.Hours})
 }
 
 func handleDelete(w http.ResponseWriter, r *http.Request) {

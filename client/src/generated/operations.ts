@@ -9,6 +9,7 @@ export const operationTable = {
   "delete-task": { id: "delete-task", method: "DELETE", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/tasks", response: "json", anonymous: false },
   "mark-done": { id: "mark-done", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/tasks/done", body: "application/json", response: "json", anonymous: false },
   "read-overview": { id: "read-overview", method: "GET", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/overview", response: "json", anonymous: false },
+  "save-printer-hours": { id: "save-printer-hours", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/devices/hours", body: "application/json", response: "json", anonymous: false },
   "save-task": { id: "save-task", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/tasks", body: "application/json", response: "json", anonymous: false },
 } as const satisfies Record<string, Operation>;
 
@@ -49,6 +50,18 @@ export interface Operations {
   ): Promise<operations["read-overview"]["responses"][200]["content"]["application/json"]>;
 
   /**
+   * POST /api/v1/modules/com.github.aux.singlergold2.maintenance/devices/hours
+   *
+   * Record the print hours the machine's own display shows
+   */
+  savePrinterHours(
+    request: {
+      body: NonNullable<operations["save-printer-hours"]["requestBody"]>["content"]["application/json"];
+    },
+    signal?: AbortSignal,
+  ): Promise<operations["save-printer-hours"]["responses"][200]["content"]["application/json"]>;
+
+  /**
    * POST /api/v1/modules/com.github.aux.singlergold2.maintenance/tasks
    *
    * Create a task on a printer, or change one
@@ -67,6 +80,7 @@ export function bindOperations(transport: Transport): Operations {
     deleteTask: (request, signal) => transport.call(operationTable["delete-task"], request, signal),
     markDone: (request, signal) => transport.call(operationTable["mark-done"], request, signal),
     readOverview: (request = {}, signal) => transport.call(operationTable["read-overview"], request, signal),
+    savePrinterHours: (request, signal) => transport.call(operationTable["save-printer-hours"], request, signal),
     saveTask: (request, signal) => transport.call(operationTable["save-task"], request, signal),
   };
 }

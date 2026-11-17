@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+    "/api/v1/modules/com.github.aux.singlergold2.maintenance/devices/hours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record the print hours the machine's own display shows
+         * @description The server only sees the prints it recorded. This stores the count the operator read off the printer, so the page can tell the two apart.
+         */
+        post: operations["save-printer-hours"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/modules/com.github.aux.singlergold2.maintenance/overview": {
         parameters: {
             query?: never;
@@ -106,6 +126,7 @@ export interface components {
             hours: number;
             prints: number;
             tasks: components["schemas"]["TaskView"][];
+            printer_hours?: number;
         };
     };
     responses: never;
@@ -116,6 +137,36 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    "save-printer-hours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    device_id: string;
+                    hours: number;
+                };
+            };
+        };
+        responses: {
+            /** @description The value that was stored. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        device_id: string;
+                        hours: number;
+                    };
+                };
+            };
+        };
+    };
     "read-overview": {
         parameters: {
             query?: never;
