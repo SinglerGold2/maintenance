@@ -338,23 +338,34 @@
                     >
                       <div class="mt-1 flex flex-wrap gap-3">
                         {#each nozzleMaterials as material (material.value)}
-                          <span
-                            class="rounded flex items-center gap-1 px-1 {material.abrasiveSafe ===
-                            true
-                              ? ''
-                              : 'bg-red-500/15'}"
-                          >
-                            <RadioGroupItem
-                              value={material.value}
-                              id={`${task.id ?? set.id}-${material.value}`}
-                            />
-                            <Label
-                              variant="option"
-                              for={`${task.id ?? set.id}-${material.value}`}
-                            >
-                              {material.label}
-                            </Label>
-                          </span>
+                          {#if material.abrasiveSafe === true}
+                            <span class="flex items-center gap-1">
+                              <RadioGroupItem
+                                value={material.value}
+                                id={`${task.id ?? set.id}-${material.value}`}
+                              />
+                              <Label
+                                variant="option"
+                                for={`${task.id ?? set.id}-${material.value}`}
+                              >
+                                {material.label}
+                              </Label>
+                            </span>
+                          {:else}
+                            <span class="flex items-center gap-1">
+                              <RadioGroupItem
+                                value={material.value}
+                                id={`${task.id ?? set.id}-${material.value}`}
+                              />
+                              <Label
+                                variant="option"
+                                class="text-red-500"
+                                for={`${task.id ?? set.id}-${material.value}`}
+                              >
+                                {material.label}
+                              </Label>
+                            </span>
+                          {/if}
                         {/each}
                       </div>
                     </RadioGroup>
