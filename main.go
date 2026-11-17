@@ -813,7 +813,8 @@ type setTaskBody struct {
 }
 
 // nozzleInterval is the life of each nozzle material, as the Prusa Knowledge
-// Base gives it: three that wear with print hours, diamond by the calendar.
+// Base gives it. Diamond outlasts the machine, so it also counts print hours
+// rather than days: a calendar interval would read as due on an idle printer.
 var nozzleInterval = map[string]struct {
 	hours float64
 	days  int
@@ -822,7 +823,7 @@ var nozzleInterval = map[string]struct {
 	"plated copper":  {hours: 800},
 	"hardened steel": {hours: 1500},
 	"bimetal":        {hours: 1700},
-	"ruby/diamond":   {days: 365},
+	"ruby/diamond":   {hours: 5000},
 }
 
 func (b setTaskBody) task() (SetTask, error) {

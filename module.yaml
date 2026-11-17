@@ -3,7 +3,7 @@
 
 name: maintenance
 kind: sink
-version: 0.12.0
+version: 0.12.1
 license: MIT
 title: Maintenance
 summary: Counts print hours per printer and reminds you when maintenance is due.
