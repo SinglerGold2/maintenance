@@ -812,6 +812,19 @@ type setTaskBody struct {
 	Material      string  `json:"material"`
 }
 
+// nozzleInterval is the life of each nozzle material, as the Prusa Knowledge
+// Base gives it: three that wear with print hours, diamond by the calendar.
+var nozzleInterval = map[string]struct {
+	hours float64
+	days  int
+}{
+	"brass":          {hours: 500},
+	"plated copper":  {hours: 800},
+	"hardened steel": {hours: 1500},
+	"bimetal":        {hours: 1700},
+	"ruby/diamond":   {days: 365},
+}
+
 func (b setTaskBody) task() (SetTask, error) {
 	task := SetTask{Name: strings.TrimSpace(b.Name), Kind: b.Kind, IntervalHours: b.IntervalHours, IntervalDays: b.IntervalDays, Material: strings.TrimSpace(b.Material)}
 
@@ -824,6 +837,15 @@ func (b setTaskBody) task() (SetTask, error) {
 	}
 
 	switch task.Kind {
+	case "nozzle":
+		life, known := nozzleInterval[strings.ToLower(task.Material)]
+		if !known {
+			return task, errors.New("a nozzle task names its material: brass, plated copper, hardened steel, bimetal or ruby/diamond")
+		}
+
+		task.Material = strings.ToLower(task.Material)
+		task.IntervalHours = life.hours
+		task.IntervalDays = life.days
 	case "hours":
 		if task.IntervalHours <= 0 {
 			return task, errors.New("a task in hours needs an interval above zero")
@@ -897,9 +919,13 @@ func handleUpdateSetTask(w http.ResponseWriter, r *http.Request) {
 
 	task.ID = r.PathValue("task")
 
-	if builtin, builtinErr := st.SetIsBuiltin(r.Context(), r.PathValue("id")); builtinErr == nil && builtin {
-		refuse(w, r, BuiltinTask.New("a schedule that ships with this module cannot be changed").With(faultString("reason", "copy it and change the copy")))
-		return
+	// A nozzle's material is a choice about the machine, not an interval, so it
+	// may be picked even where the schedule itself ships with the module.
+	if task.Kind != "nozzle" {
+		if builtin, builtinErr := st.SetIsBuiltin(r.Context(), r.PathValue("id")); builtinErr == nil && builtin {
+			refuse(w, r, BuiltinTask.New("a schedule that ships with this module cannot be changed").With(faultString("reason", "copy it and change the copy")))
+			return
+		}
 	}
 
 	if writeErr := st.UpdateSetTask(r.Context(), r.PathValue("id"), task); writeErr != nil {
@@ -1263,14 +1289,23 @@ func (m *module) view(tasks []Task, hours float64, now time.Time) []TaskView {
 	for _, task := range tasks {
 		var elapsed, interval float64
 
-		switch task.Kind {
-		case "hours":
+		switch {
+		case task.IntervalDays > 0 && task.IntervalHours == 0:
+			interval = float64(task.IntervalDays) * 24
+			last := now
+			if task.LastDoneAt != "" {
+				if parsed, err := time.Parse(time.RFC3339, task.LastDoneAt); err == nil {
+					last = parsed
+				}
+			}
+			elapsed = now.Sub(last).Hours()
+		case task.Kind == "hours" || task.Kind == "nozzle":
 			interval = task.IntervalHours
 			elapsed = hours - task.LastDoneHours
 			if elapsed < 0 {
 				elapsed = 0
 			}
-		case "days":
+		case task.Kind == "days":
 			interval = float64(task.IntervalDays) * 24
 			last := now
 			if task.LastDoneAt != "" {

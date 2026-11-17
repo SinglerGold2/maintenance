@@ -65,5 +65,11 @@
   "maintenance.page.introValues": "The shipped intervals are the ones in the Prusa Knowledge Base article on the CORE One, and each schedule links to the article it was read from. Another model's article may give different numbers, so check it before you rely on them, and put your own values in a copy you make here.",
   "maintenance.page.introNew": "Name of the new schedule creates your own: give it a name, pick the printer model it is meant for, press New schedule, then open it and add the tasks you want, in print hours or in days. A schedule that counts days is how you ask for a check every three months no matter how much the printer runs.",
   "maintenance.page.kb": "Knowledge Base",
-  "maintenance.tab.setHint": "Which schedule this printer follows. A shipped schedule holds the Prusa Knowledge Base intervals; a copy of it is where you change them."
+  "maintenance.tab.setHint": "Which schedule this printer follows. A shipped schedule holds the Prusa Knowledge Base intervals; a copy of it is where you change them.",
+  "maintenance.page.nozzleMaterial": "Nozzle material",
+  "maintenance.page.materialBrass": "Brass",
+  "maintenance.page.materialPlatedCopper": "Plated copper",
+  "maintenance.page.materialHardenedSteel": "Hardened steel",
+  "maintenance.page.materialBimetal": "Bimetal",
+  "maintenance.page.materialRubyDiamond": "Ruby/diamond"
 }

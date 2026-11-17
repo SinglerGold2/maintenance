@@ -5,6 +5,8 @@
     CardContent,
     Input,
     PageHeader,
+    RadioGroup,
+    RadioGroupItem,
     Select,
     SelectContent,
     SelectItem,
@@ -228,7 +230,7 @@
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <Button
-              variant="ghost"
+              variant="secondary"
               size="sm"
               disabled={busy}
               onclick={() => toggle(set)}
@@ -238,7 +240,7 @@
                 : t('maintenance.page.enable')}
             </Button>
             <Button
-              variant="ghost"
+              variant="secondary"
               size="sm"
               disabled={busy}
               onclick={() => duplicate(set)}
@@ -247,7 +249,7 @@
             </Button>
             {#if !set.builtin}
               <Button
-                variant="ghost"
+                variant="destructive"
                 size="sm"
                 disabled={busy}
                 onclick={() => remove(set)}
@@ -272,27 +274,54 @@
           <div class="mt-3 flex flex-col gap-2">
             {#each set.tasks as task (task.id)}
               <div
-                class="border-neutral-200 flex items-center justify-between gap-2 border-t pt-2"
+                class="border-neutral-200 flex flex-wrap items-center justify-between gap-2 border-t pt-2"
               >
-                <span class="text-sm">{task.name}</span>
-                <span class="text-neutral-500 text-sm">
+                <div class="flex min-w-60 flex-col">
+                  <span class="text-sm">{task.name}</span>
+                  {#if task.kind === 'nozzle'}
+                    <RadioGroup
+                      value={task.material ?? 'hardened steel'}
+                      aria-label={t('maintenance.page.nozzleMaterial')}
+                      onValueChange={(next: string) => {
+                        if (task.id !== undefined) {
+                          void act(() =>
+                            api.updateSetTask(set.id, task.id ?? '', {
+                              name: task.name,
+                              kind: 'nozzle',
+                              material: next,
+                            }),
+                          );
+                        }
+                      }}
+                    >
+                      <div class="mt-1 flex flex-wrap gap-3">
+                        {#each nozzleMaterials as material (material.value)}
+                          <span class="flex items-center gap-1">
+                            <RadioGroupItem
+                              value={material.value}
+                              id={`${task.id ?? set.id}-${material.value}`}
+                            />
+                            <label
+                              for={`${task.id ?? set.id}-${material.value}`}
+                              class="text-sm"
+                            >
+                              {material.label}
+                            </label>
+                          </span>
+                        {/each}
+                      </div>
+                    </RadioGroup>
+                  {/if}
+                </div>
+                <span class="text-neutral-500 ml-auto text-sm">
                   {task.kind === 'days'
                     ? `${String(task.interval_days ?? 0)} d`
                     : `${String(task.interval_hours ?? 0)} h`}
-                  {#if task.material}· {task.material}{/if}
+                  {#if task.material && task.kind !== 'nozzle'}· {task.material}{/if}
                 </span>
-                {#if !set.builtin}
+                {#if !set.builtin && task.kind !== 'nozzle'}
                   <Button
-                    variant="ghost"
-                    size="sm"
-                    disabled={busy}
-                    onclick={() =>
-                      task.id !== undefined && dropTask(set, task.id)}
-                  >
-                    {t('maintenance.page.remove')}
-                  </Button>
-                  <Button
-                    variant="ghost"
+                    variant="secondary"
                     size="sm"
                     disabled={busy}
                     onclick={() =>
@@ -307,6 +336,17 @@
                       )}
                   >
                     {t('maintenance.page.save')}
+                  </Button>
+                {/if}
+                {#if !set.builtin}
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    disabled={busy}
+                    onclick={() =>
+                      task.id !== undefined && dropTask(set, task.id)}
+                  >
+                    {t('maintenance.page.remove')}
                   </Button>
                 {/if}
               </div>
