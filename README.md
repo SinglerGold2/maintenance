@@ -52,8 +52,23 @@ docker restart prusa-connect-local
 ```
 
 On a native Linux server the same command works without docker, with
-`./prusa_connect_local`. On Windows, install from the marketplace; the release
-binaries are not installers and are not copied by hand.
+`./prusa_connect_local`.
+
+On Windows the marketplace is the easy way: Settings, Extensions, Maintenance,
+Install. To do it by hand, open PowerShell in the folder the server runs from
+(the one with `config/` in it) and use the bundle, not the `.exe` from the
+release:
+
+```powershell
+cd C:\prusa-connect
+.\prusa_connect_windows_amd64.exe module add github.com/singlergold2/maintenance@0.10.10 `
+  -from C:\Users\you\Downloads\maintenance-0.10.10.tar.gz -approve -database sqlite
+```
+
+Then restart the server. It unpacks the bundle into
+`config\config.d\modules\maintenance\bin` itself; nothing is copied by hand.
+The `.exe` files in a release are the module's own program, which the server
+starts as a child process, not installers.
 
 The module asks for the fleet, the print history, `read_storage` for the G-code,
 and a database of its own. The service runs as the Docker container
