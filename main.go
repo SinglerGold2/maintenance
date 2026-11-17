@@ -783,6 +783,8 @@ func (m *module) splitJob(ctx context.Context, st *store, files *storageapi.Clie
 		return fmt.Errorf("the file is %d bytes, larger than the %d this module reads", file.Size(), maxToolFile)
 	}
 
+	fmt.Fprintf(os.Stderr, "%s: print %s: reading %s, %d bytes\n", name, job.ID, job.Path, file.Size())
+
 	text, err := gcode.ReadAll(file, file.Size())
 	if err != nil {
 		_ = st.MarkJobSeen(ctx, deviceID, job.ID)
@@ -791,6 +793,8 @@ func (m *module) splitJob(ctx context.Context, st *store, files *storageapi.Clie
 	}
 
 	usage := gcode.Parse(text)
+	fmt.Fprintf(os.Stderr, "%s: print %s: %d lines, %d tools\n", name, job.ID, usage.Lines, len(usage.Extrusion))
+
 	if usage.Lines == 0 {
 		return nil
 	}
@@ -805,6 +809,8 @@ func (m *module) splitJob(ctx context.Context, st *store, files *storageapi.Clie
 	}
 
 	length := job.Ended.Sub(job.Started).Hours()
+	fmt.Fprintf(os.Stderr, "%s: print %s: %d mm, %.4f hours\n", name, job.ID, int(total), length)
+
 	if length <= 0 {
 		return nil
 	}

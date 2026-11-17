@@ -48,6 +48,10 @@
   }
 
   function hours(value: number): string {
+    if (value > 0 && value < 1) {
+      return String(Math.round(value * 60 * 10) / 10) + ' min';
+    }
+
     return String(Math.round(value * 10) / 10) + ' h';
   }
 
