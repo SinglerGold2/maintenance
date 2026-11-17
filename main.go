@@ -377,7 +377,7 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 
 		tools := make([]ToolHours, 0, len(toolMap))
 		for tool, toolHours := range toolMap {
-			tools = append(tools, ToolHours{Tool: tool, Hours: round1(toolHours)})
+			tools = append(tools, ToolHours{Tool: tool, Hours: toolHours})
 		}
 
 		sort.Slice(tools, func(i, j int) bool { return tools[i].Tool < tools[j].Tool })
@@ -389,7 +389,7 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			ID:           device.ID,
 			Name:         device.Name,
 			Model:        device.Model,
-			Hours:        round1(hours),
+			Hours:        hours,
 			Prints:       prints,
 			PrinterHours: typed,
 			Tools:        tools,
@@ -709,6 +709,8 @@ func (m *module) attributeTools(ctx context.Context, st *store, deviceID, princi
 		return nil
 	}
 
+	fmt.Fprintf(os.Stderr, "%s: tools of %s: starting\n", name, deviceID)
+
 	read := 0
 	cursor := ""
 
@@ -717,6 +719,8 @@ func (m *module) attributeTools(ctx context.Context, st *store, deviceID, princi
 		if err != nil {
 			return err
 		}
+
+		fmt.Fprintf(os.Stderr, "%s: tools of %s: %d prints in the page\n", name, deviceID, len(history.Items))
 
 		for _, job := range history.Items {
 			if job.Ended == nil || job.Path == "" {
@@ -891,6 +895,8 @@ func (m *module) hoursOf(ctx context.Context, deviceID, principal string) (float
 		if err != nil {
 			return 0, 0, err
 		}
+
+		fmt.Fprintf(os.Stderr, "%s: tools of %s: %d prints in the page\n", name, deviceID, len(history.Items))
 
 		for _, job := range history.Items {
 			if job.Ended == nil || job.Started.IsZero() {
