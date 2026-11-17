@@ -3,7 +3,7 @@
 
 name: maintenance
 kind: sink
-version: 0.10.0
+version: 0.10.5
 license: MIT
 title: Maintenance
 summary: Counts print hours per printer and reminds you when maintenance is due.
@@ -33,6 +33,8 @@ needs:
 permissions:
   # read the fleet and the print history the hours come from
   - observe
+  # read a finished print's G-code from the server's storage
+  - read_storage
 
 events:
   maintenance: maintenance.task

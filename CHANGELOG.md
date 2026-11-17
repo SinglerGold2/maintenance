@@ -3,6 +3,55 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.10.2 - 2026-11-17
+
+### Fixed
+
+- The module asks for `read_storage`, so the server lets it read a print's file.
+  0.10.1 asked for the API but not for the permission the API checks.
+
+## 0.10.1 - 2026-11-17
+
+### Fixed
+
+- The migration that adds the tool tables is named with a time that exists.
+  0.10.0 named it 24:00:00, and the database refused it, so the module did not
+  start.
+
+## 0.10.5 - 2026-11-17
+
+### Fixed
+
+- A print whose file is gone from the storage is not opened again on every
+  load; it counts as read.
+- A print is marked read only once its file was read, so a failure no longer
+  loses its hours.
+
+## 0.10.4 - 2026-11-17
+
+### Fixed
+
+- The prints the earlier 0.10 releases failed on are read again.
+
+## 0.10.3 - 2026-11-17
+
+### Fixed
+
+- A print is read from the server's storage by the file's own name when the
+  printer's path (`usb/…`) names no file there.
+
+## 0.10.2 - 2026-11-17
+
+### Fixed
+
+- The module asks for `read_storage`, the permission the storage API checks.
+
+## 0.10.1 - 2026-11-17
+
+### Fixed
+
+- The tool tables are added by a migration with a name the database accepts.
+
 ## 0.10.0 - 2026-11-17
 
 ### Added

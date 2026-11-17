@@ -17,6 +17,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path"
 	"sort"
 	"strings"
 	"sync"
@@ -680,19 +681,38 @@ func (m *module) attributeTools(ctx context.Context, st *store, deviceID string)
 // its counter. A file this module cannot read is marked seen all the same, so
 // the same broken file is not opened on every load.
 func (m *module) splitJob(ctx context.Context, st *store, files *storageapi.Client, deviceID string, job deviceapi.Job) error {
-	defer func() { _ = st.MarkJobSeen(ctx, deviceID, job.ID) }()
-
 	file, err := files.Open(ctx, storageapi.Target{Storage: "local", Path: job.Path})
+	if err != nil && errors.Is(err, storageapi.ErrNoFile) {
+		// The print is gone from the storage. Nothing to read, now or later.
+		_ = st.MarkJobSeen(ctx, deviceID, job.ID)
+
+		return nil
+	}
+
 	if err != nil {
-		return err
+		// The printer's own path carries its folder ("usb/…"), the server's
+		// storage keeps the file under its name alone. Try that before giving up.
+		base := path.Base(job.Path)
+		if base == job.Path {
+			return err
+		}
+
+		file, err = files.Open(ctx, storageapi.Target{Storage: "local", Path: base})
+		if err != nil {
+			return err
+		}
 	}
 
 	if file.Size() > maxToolFile {
+		_ = st.MarkJobSeen(ctx, deviceID, job.ID)
+
 		return fmt.Errorf("the file is %d bytes, larger than the %d this module reads", file.Size(), maxToolFile)
 	}
 
 	text, err := gcode.ReadAll(file, file.Size())
 	if err != nil {
+		_ = st.MarkJobSeen(ctx, deviceID, job.ID)
+
 		return err
 	}
 
@@ -722,7 +742,7 @@ func (m *module) splitJob(ctx context.Context, st *store, files *storageapi.Clie
 		}
 	}
 
-	return nil
+	return st.MarkJobSeen(ctx, deviceID, job.ID)
 }
 
 func (m *module) store() (*store, error) {
