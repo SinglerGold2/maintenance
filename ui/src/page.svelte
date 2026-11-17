@@ -49,6 +49,20 @@
     { value: 'M3', label: 'M3' },
   ];
 
+  const nozzleMaterials: Model[] = [
+    { value: 'brass', label: t('maintenance.page.materialBrass') },
+    {
+      value: 'plated copper',
+      label: t('maintenance.page.materialPlatedCopper'),
+    },
+    {
+      value: 'hardened steel',
+      label: t('maintenance.page.materialHardenedSteel'),
+    },
+    { value: 'bimetal', label: t('maintenance.page.materialBimetal') },
+    { value: 'ruby/diamond', label: t('maintenance.page.materialRubyDiamond') },
+  ];
+
   const kinds: Model[] = [
     { value: 'hours', label: t('maintenance.page.hours') },
     { value: 'days', label: t('maintenance.page.days') },
