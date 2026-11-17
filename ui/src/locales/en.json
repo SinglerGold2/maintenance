@@ -1,0 +1,26 @@
+{
+  "_meta.language": "English",
+  "_meta.note": "This module's own texts. The host reads this file from locales/en.json beside the bundle's entry and merges it under the module's namespace. Copy it to <tag>.json to translate.",
+
+  "maintenance.page.title": "Maintenance",
+  "maintenance.page.empty": "No printer is registered yet, so there is nothing to maintain.",
+  "maintenance.page.hours": "Print hours",
+  "maintenance.page.prints": "Prints",
+  "maintenance.page.task": "Task",
+  "maintenance.page.interval": "Interval",
+  "maintenance.page.progress": "Progress",
+  "maintenance.page.remaining": "left",
+  "maintenance.page.due": "due",
+  "maintenance.page.soon": "due soon",
+  "maintenance.page.done": "Done",
+  "maintenance.page.remove": "Remove",
+  "maintenance.page.add": "Add a task",
+  "maintenance.page.printer": "Printer",
+  "maintenance.page.choose": "Choose a printer",
+  "maintenance.page.taskPlaceholder": "Such as: check the belts",
+  "maintenance.page.every": "Every",
+  "maintenance.page.hoursUnit": "Print hours",
+  "maintenance.page.daysUnit": "Days",
+  "maintenance.page.days": "Days",
+  "maintenance.page.addButton": "Add"
+}

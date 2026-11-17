@@ -1,0 +1,270 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "maintenance",
+    "version": "0.1.0",
+    "description": "The routes maintenance serves. Every path is relative to the mount the host assigns."
+  },
+  "paths": {
+    "/overview": {
+      "get": {
+        "operationId": "read-overview",
+        "summary": "Every printer with its hours and its maintenance tasks",
+        "responses": {
+          "200": {
+            "description": "The fleet and its tasks.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "alert_percent": {
+                      "type": "integer"
+                    },
+                    "devices": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Device"
+                      }
+                    }
+                  },
+                  "required": [
+                    "alert_percent",
+                    "devices"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Every printer the caller may observe, with its print hours, its print count and its maintenance tasks."
+      }
+    },
+    "/tasks": {
+      "post": {
+        "operationId": "save-task",
+        "summary": "Create a task on a printer, or change one",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Task"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The task as it was written.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          }
+        },
+        "description": "Create a task on a printer, or change one by its id. A task is a check with an interval in print hours or in days."
+      },
+      "delete": {
+        "operationId": "delete-task",
+        "summary": "Remove a task",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The id that was removed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "deleted"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Remove one task by its id."
+      }
+    },
+    "/tasks/done": {
+      "post": {
+        "operationId": "mark-done",
+        "summary": "Mark a task as done at the printer's current hours",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The task as it now stands.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          }
+        },
+        "description": "Mark a task done: its counter starts again at the printer's current print hours."
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Task": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "device_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "hours",
+              "days"
+            ]
+          },
+          "interval_hours": {
+            "type": "number"
+          },
+          "interval_days": {
+            "type": "integer"
+          },
+          "last_done_hours": {
+            "type": "number"
+          },
+          "last_done_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id",
+          "name",
+          "kind"
+        ]
+      },
+      "TaskView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "device_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "interval_hours": {
+            "type": "number"
+          },
+          "interval_days": {
+            "type": "integer"
+          },
+          "last_done_hours": {
+            "type": "number"
+          },
+          "last_done_at": {
+            "type": "string"
+          },
+          "elapsed": {
+            "type": "number"
+          },
+          "remaining": {
+            "type": "number"
+          },
+          "percent": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "device_id",
+          "name",
+          "kind",
+          "elapsed",
+          "remaining",
+          "percent",
+          "status"
+        ]
+      },
+      "Device": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "hours": {
+            "type": "number"
+          },
+          "prints": {
+            "type": "integer"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskView"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "hours",
+          "prints",
+          "tasks"
+        ]
+      }
+    }
+  }
+}
