@@ -21,11 +21,23 @@ Prusa Knowledge Base:
 | Lubricate the linear rail | 90 days |
 | Check the nozzle, replace when worn | 5000 print hours, hardened steel |
 
-The **Maintenance** page in the sidebar holds one schedule for the fleet, so a
-changed interval reaches every printer's task of that name; the hours each
-printer collected stay. **Done** asks first and starts the next interval at the
-printer's current hours. Tasks that ship with the module cannot be removed, the
-ones you add can.
+The **Maintenance** page in the sidebar holds the schedules, called sets. Eight
+ship with the module, one per model and one for any printer, each starting from
+the Prusa Knowledge Base and each linking the article it came from. A printer
+follows the set its model brings until you pick another one in the **Schedule**
+field on its tab; its own hours and Done marks stay.
+
+A shipped set can be switched off, never edited or deleted: duplicate it, edit
+the copy, and assign that. A new set starts empty. Its lines take an interval in
+print hours or in days, which is how a quarterly check is asked for no matter
+how much the printer runs.
+
+A nozzle line picks its material, and the interval follows: brass 500 h,
+stainless steel 700 h, plated copper 800 h, hardened steel 1500 h, bimetal
+1700 h, silicon carbide 2500 h, tungsten carbide 3000 h, ruby/diamond 5000 h.
+The first three are printed in bold italic because carbon and glass filled
+filament ruins them. **Done** asks first and starts the next interval at the
+printer's current hours; a shipped task cannot be removed, the ones you add can.
 
 Each printer's tab also says how many hours each tool ran, read from the G-code
 of finished prints: `.gcode` and `.bgcode`, deflate, heatshrink and MeatPack
@@ -47,10 +59,10 @@ The marketplace is the normal way. To install a release yourself:
 
 ```bash
 # the signed bundle from the GitHub release
-docker cp maintenance-0.10.20.tar.gz prusa-connect-local:/tmp/
+docker cp maintenance-0.13.0.tar.gz prusa-connect-local:/tmp/
 docker exec -w /app prusa-connect-local /app/prusa_connect_local \
-  module add github.com/singlergold2/maintenance@0.10.20 \
-  -from /tmp/maintenance-0.10.20.tar.gz -approve -database sqlite
+  module add github.com/singlergold2/maintenance@0.13.0 \
+  -from /tmp/maintenance-0.13.0.tar.gz -approve -database sqlite
 docker restart prusa-connect-local
 ```
 
@@ -64,8 +76,8 @@ release:
 
 ```powershell
 cd C:\prusa-connect
-.\prusa_connect_windows_amd64.exe module add github.com/singlergold2/maintenance@0.10.20 `
-  -from C:\Users\you\Downloads\maintenance-0.10.20.tar.gz -approve -database sqlite
+.\prusa_connect_windows_amd64.exe module add github.com/singlergold2/maintenance@0.13.0 `
+  -from C:\Users\you\Downloads\maintenance-0.13.0.tar.gz -approve -database sqlite
 ```
 
 Then restart the server. It unpacks the bundle into
@@ -78,8 +90,8 @@ folder the server runs from (the one with `config/` in it):
 
 ```bash
 cd ~/prusa-connect
-./prusa_connect_macos_arm64 module add github.com/singlergold2/maintenance@0.10.20 \
-  -from ~/Downloads/maintenance-0.10.20.tar.gz -approve -database sqlite
+./prusa_connect_macos_arm64 module add github.com/singlergold2/maintenance@0.13.0 \
+  -from ~/Downloads/maintenance-0.13.0.tar.gz -approve -database sqlite
 ```
 
 Then restart the server; it unpacks the bundle into
