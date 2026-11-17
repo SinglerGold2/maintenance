@@ -31,5 +31,8 @@
   "maintenance.page.serverTracked": "of which this server saw",
   "maintenance.page.printerHours": "Printer hours",
   "maintenance.page.printerHoursPlaceholder": "14d 7h or 343",
-  "maintenance.page.printerHoursHint": "Type what the printer's own display shows, such as 14d 7h. The printer's counter is the whole, the server's count is the part it saw."
+  "maintenance.page.printerHoursHint": "Type what the printer's own display shows, such as 14d 7h. The printer's counter is the whole, the server's count is the part it saw.",
+  "maintenance.page.confirmDoneTitle": "Did you really do this maintenance?",
+  "maintenance.page.confirmDoneBody": "The counter starts again at the printer's current hours. Only press yes once the work is done.",
+  "maintenance.page.confirmDoneYes": "Yes, it is done"
 }

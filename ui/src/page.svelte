@@ -4,6 +4,7 @@
     Button,
     Card,
     CardContent,
+    ConfirmDialog,
     FaultAlert,
     Input,
     PageHeader,
@@ -32,6 +33,7 @@
     Record<string, { interval: number | undefined; material: string }>
   >({});
   let printerDrafts = $state<Record<string, string>>({});
+  let pendingDone = $state<TaskView | undefined>();
 
   function draftAt(deviceID: string): {
     name: string;
@@ -362,7 +364,7 @@
                         variant="secondary"
                         size="sm"
                         disabled={busy}
-                        onclick={() => void act(() => api.markDone(task.id))}
+                        onclick={() => (pendingDone = task)}
                       >
                         {t('maintenance.page.done')}
                       </Button>
@@ -490,4 +492,20 @@
       </Card>
     {/each}
   {/if}
+
+  <ConfirmDialog
+    open={pendingDone !== undefined}
+    onOpenChange={(open) => {
+      if (!open) pendingDone = undefined;
+    }}
+    title={t('maintenance.page.confirmDoneTitle')}
+    description={t('maintenance.page.confirmDoneBody')}
+    confirmLabel={t('maintenance.page.confirmDoneYes')}
+    variant="confirm"
+    onConfirm={() => {
+      const task = pendingDone;
+      pendingDone = undefined;
+      if (task !== undefined) void act(() => api.markDone(task.id));
+    }}
+  />
 </div>

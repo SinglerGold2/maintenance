@@ -15,7 +15,7 @@ name: maintenance
 # which is what a module with a process needs. The browser half is declared
 # beside it, as `service.assets`.
 kind: sink
-version: 0.6.0
+version: 0.6.1
 # The licence this module is released under, required. Free text of at most
 # 200 characters; an SPDX identifier is the usual form. Operators read it on
 # the marketplace before they install. Change it to yours.
