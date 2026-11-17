@@ -360,14 +360,17 @@
                       >
                         {t('maintenance.page.reset')}
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        disabled={busy}
-                        onclick={() => void act(() => api.deleteTask(task.id))}
-                      >
-                        {t('maintenance.page.remove')}
-                      </Button>
+                      {#if !task.builtin}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={busy}
+                          onclick={() =>
+                            void act(() => api.deleteTask(task.id))}
+                        >
+                          {t('maintenance.page.remove')}
+                        </Button>
+                      {/if}
                     </div>
                   </div>
 

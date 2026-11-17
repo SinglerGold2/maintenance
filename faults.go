@@ -75,6 +75,15 @@ var (
 		"reason",
 	))
 
+	// BuiltinTask is a task the module ships, which an operator may change but
+	// not remove.
+	BuiltinTask = fault.Register(faultDomain, "BUILTIN_TASK", http.StatusConflict, fault.Document(
+		"This task ships with the module and cannot be removed",
+		"Change its interval instead, or leave it in place.",
+		fault.RetryNever,
+		fault.ShowDetail,
+	))
+
 	// HistoryFailed is the print history being unreadable.
 	HistoryFailed = fault.Register(faultDomain, "HISTORY_FAILED", http.StatusBadGateway, fault.Document(
 		"The print history could not be read",

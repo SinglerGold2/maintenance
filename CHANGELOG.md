@@ -3,6 +3,14 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.4.0 - 2026-11-17
+
+### Added
+
+- A task the module ships carries `builtin: true`. Its interval may be changed,
+  but `DELETE /tasks` refuses it with `BUILTIN_TASK`, and the page shows no
+  Remove button for it. Only the tasks an operator writes can be removed.
+
 ## 0.3.4 - 2026-11-17
 
 ### Fixed

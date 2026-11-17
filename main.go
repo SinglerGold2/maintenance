@@ -86,6 +86,7 @@ type Task struct {
 	LastDoneHours float64 `json:"last_done_hours"`
 	LastDoneAt    string  `json:"last_done_at,omitempty"`
 	Material      string  `json:"material,omitempty"`
+	Builtin       bool    `json:"builtin,omitempty"`
 }
 
 // TaskView is a task with what the counters say about it.
@@ -463,6 +464,17 @@ func handleDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	task, foundErr := st.Task(r.Context(), id)
+	if foundErr != nil {
+		refuse(w, r, NoTask.New("no task carries that id").With(faultString("id", id)))
+		return
+	}
+
+	if task.Builtin {
+		refuse(w, r, BuiltinTask.New("this task ships with the module and cannot be removed"))
+		return
+	}
+
 	if deleteErr := st.Delete(r.Context(), id); deleteErr != nil {
 		refuse(w, r, StoreFailed.New("the task could not be removed").With(faultString("reason", deleteErr.Error())))
 		return
@@ -625,15 +637,15 @@ func defaultsFor(model, deviceID string, now time.Time) []Task {
 
 	if !strings.Contains(upper, "COREONE") {
 		return []Task{
-			{ID: newID(), DeviceID: deviceID, Name: "Inspect the machine", Kind: "hours", IntervalHours: 200, LastDoneAt: stamp},
+			{ID: newID(), DeviceID: deviceID, Builtin: true, Name: "Inspect the machine", Kind: "hours", IntervalHours: 200, LastDoneAt: stamp},
 		}
 	}
 
 	return []Task{
-		{ID: newID(), DeviceID: deviceID, Name: "Check axes, belts, fans and extruder", Kind: "hours", IntervalHours: 200, LastDoneAt: stamp},
-		{ID: newID(), DeviceID: deviceID, Name: "Inspect the electrical connectors", Kind: "hours", IntervalHours: 600, LastDoneAt: stamp},
-		{ID: newID(), DeviceID: deviceID, Name: "Lubricate the linear rail", Kind: "days", IntervalDays: 90, LastDoneAt: stamp},
-		{ID: newID(), DeviceID: deviceID, Name: "Check the nozzle, replace when worn", Kind: "hours", IntervalHours: 5000, LastDoneAt: stamp, Material: "hardened steel"},
+		{ID: newID(), DeviceID: deviceID, Builtin: true, Name: "Check axes, belts, fans and extruder", Kind: "hours", IntervalHours: 200, LastDoneAt: stamp},
+		{ID: newID(), DeviceID: deviceID, Builtin: true, Name: "Inspect the electrical connectors", Kind: "hours", IntervalHours: 600, LastDoneAt: stamp},
+		{ID: newID(), DeviceID: deviceID, Builtin: true, Name: "Lubricate the linear rail", Kind: "days", IntervalDays: 90, LastDoneAt: stamp},
+		{ID: newID(), DeviceID: deviceID, Builtin: true, Name: "Check the nozzle, replace when worn", Kind: "hours", IntervalHours: 5000, LastDoneAt: stamp, Material: "hardened steel"},
 	}
 }
 
