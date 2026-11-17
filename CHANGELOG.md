@@ -3,6 +3,16 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.3.2 - 2026-11-17
+
+### Fixed
+
+- A printer's default schedule is written once. Two page loads that arrived
+  together used to write it twice, so a printer could carry the same four tasks
+  several times over.
+- The duplicates the earlier releases wrote are removed when this release opens
+  the database.
+
 ## 0.3.1 - 2026-11-17
 
 ### Changed

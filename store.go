@@ -122,6 +122,25 @@ func (s *store) SetPrinterHours(ctx context.Context, deviceID string, hours floa
 	return err
 }
 
+// MarkSeeded answers whether this call is the one that seeds the printer's
+// schedule. The first caller wins and every later one is told no.
+func (s *store) MarkSeeded(ctx context.Context, deviceID string) (bool, error) {
+	query := fmt.Sprintf(`INSERT INTO maintenance_seeded (device_id, seeded_at) VALUES (%s, %s)
+        ON CONFLICT (device_id) DO NOTHING`, s.place(1), s.place(2))
+
+	result, err := s.db.ExecContext(ctx, query, deviceID, nowText())
+	if err != nil {
+		return false, err
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+
+	return rows == 1, nil
+}
+
 func nullable(value string) any {
 	if value == "" {
 		return nil

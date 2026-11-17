@@ -270,10 +270,18 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(tasks) == 0 {
-			tasks = defaultsFor(device.Model, time.Now().UTC())
-			if seedErr := st.Insert(r.Context(), tasks); seedErr != nil {
-				refuse(w, r, StoreFailed.New("the default tasks could not be written").With(faultString("reason", seedErr.Error())))
+			first, seedErr := st.MarkSeeded(r.Context(), device.ID)
+			if seedErr != nil {
+				refuse(w, r, StoreFailed.New("the seed marker could not be written").With(faultString("reason", seedErr.Error())))
 				return
+			}
+
+			if first {
+				tasks = defaultsFor(device.Model, time.Now().UTC())
+				if seedErr = st.Insert(r.Context(), tasks); seedErr != nil {
+					refuse(w, r, StoreFailed.New("the default tasks could not be written").With(faultString("reason", seedErr.Error())))
+					return
+				}
 			}
 		}
 
