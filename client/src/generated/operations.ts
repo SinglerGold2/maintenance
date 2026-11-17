@@ -10,6 +10,7 @@ export const operationTable = {
   "mark-done": { id: "mark-done", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/tasks/done", body: "application/json", response: "json", anonymous: false },
   "read-overview": { id: "read-overview", method: "GET", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/overview", response: "json", anonymous: false },
   "read-template": { id: "read-template", method: "GET", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/template", response: "json", anonymous: false },
+  "reset-tool": { id: "reset-tool", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/devices/tools/reset", body: "application/json", response: "json", anonymous: false },
   "save-printer-hours": { id: "save-printer-hours", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/devices/hours", body: "application/json", response: "json", anonymous: false },
   "save-task": { id: "save-task", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/tasks", body: "application/json", response: "json", anonymous: false },
   "save-template": { id: "save-template", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/template", body: "application/json", response: "json", anonymous: false },
@@ -62,6 +63,18 @@ export interface Operations {
   ): Promise<operations["read-template"]["responses"][200]["content"]["application/json"]>;
 
   /**
+   * POST /api/v1/modules/com.github.aux.singlergold2.maintenance/devices/tools/reset
+   *
+   * Start one tool's counter again at zero
+   */
+  resetTool(
+    request: {
+      body: NonNullable<operations["reset-tool"]["requestBody"]>["content"]["application/json"];
+    },
+    signal?: AbortSignal,
+  ): Promise<operations["reset-tool"]["responses"][200]["content"]["application/json"]>;
+
+  /**
    * POST /api/v1/modules/com.github.aux.singlergold2.maintenance/devices/hours
    *
    * Record the print hours the machine's own display shows
@@ -105,6 +118,7 @@ export function bindOperations(transport: Transport): Operations {
     markDone: (request, signal) => transport.call(operationTable["mark-done"], request, signal),
     readOverview: (request = {}, signal) => transport.call(operationTable["read-overview"], request, signal),
     readTemplate: (request = {}, signal) => transport.call(operationTable["read-template"], request, signal),
+    resetTool: (request, signal) => transport.call(operationTable["reset-tool"], request, signal),
     savePrinterHours: (request, signal) => transport.call(operationTable["save-printer-hours"], request, signal),
     saveTask: (request, signal) => transport.call(operationTable["save-task"], request, signal),
     saveTemplate: (request, signal) => transport.call(operationTable["save-template"], request, signal),

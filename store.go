@@ -239,7 +239,7 @@ func (s *store) MarkJobSeen(ctx context.Context, deviceID, jobID string) error {
 
 // ToolHours is the hours each tool has run on one printer.
 func (s *store) ToolHours(ctx context.Context, deviceID string) (map[int]float64, error) {
-	query := fmt.Sprintf(`SELECT tool, hours FROM maintenance_tool_hours WHERE device_id = %s ORDER BY tool`, s.place(1))
+	query := fmt.Sprintf(`SELECT tool, hours - reset_hours FROM maintenance_tool_hours WHERE device_id = %s ORDER BY tool`, s.place(1))
 
 	rows, err := s.db.QueryContext(ctx, query, deviceID)
 	if err != nil {
@@ -259,10 +259,28 @@ func (s *store) ToolHours(ctx context.Context, deviceID string) (map[int]float64
 			return nil, err
 		}
 
+		if hours < 0 {
+			hours = 0
+		}
+
 		out[tool] = hours
 	}
 
 	return out, rows.Err()
+}
+
+// ResetTool starts one tool's counter again at zero, whatever the printer's
+// own counter says: a nozzle was replaced, the machine's total did not move.
+func (s *store) ResetTool(ctx context.Context, deviceID string, tool int, at float64) error {
+	query := fmt.Sprintf(`INSERT INTO maintenance_tool_hours (device_id, tool, hours, reset_hours, updated_at)
+        VALUES (%s, %s, %s, %s, %s)
+        ON CONFLICT (device_id, tool) DO UPDATE SET hours = EXCLUDED.hours,
+        reset_hours = EXCLUDED.reset_hours, updated_at = EXCLUDED.updated_at`,
+		s.place(1), s.place(2), s.place(3), s.place(4), s.place(5))
+
+	_, err := s.db.ExecContext(ctx, query, deviceID, tool, at, at, nowText())
+
+	return err
 }
 
 func (s *store) AddToolHours(ctx context.Context, deviceID string, tool int, hours float64) error {

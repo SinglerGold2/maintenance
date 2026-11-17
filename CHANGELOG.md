@@ -18,6 +18,22 @@ first. `version:` in `module.yaml` is the newest heading below.
   0.10.0 named it 24:00:00, and the database refused it, so the module did not
   start.
 
+## 0.10.7 - 2026-11-17
+
+### Added
+
+- Each tool can be reset from the printer's Maintenance tab, after a nozzle
+  change. A dialog asks first; the printer's own counter is not touched.
+- The tab says the per-tool hours are an indication, not a measurement.
+
+## 0.10.6 - 2026-11-17
+
+### Fixed
+
+- A printer with one tool reports the printer's own counter as that tool's
+  hours. It used to report only the hours of the prints whose file this module
+  could still read, which read far too low.
+
 ## 0.10.5 - 2026-11-17
 
 ### Fixed

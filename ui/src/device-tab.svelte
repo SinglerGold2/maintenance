@@ -14,6 +14,7 @@
   let busy = $state(false);
   let printerDraft = $state('');
   let pendingDone = $state<TaskView | undefined>();
+  let pendingToolReset = $state<number | undefined>();
 
   const device = $derived(
     overview?.devices.find((entry) => entry.id === deviceId),
@@ -205,6 +206,22 @@
       {/each}
     </div>
   </div>
+
+  <ConfirmDialog
+    open={pendingToolReset !== undefined}
+    onOpenChange={(open) => {
+      if (!open) pendingToolReset = undefined;
+    }}
+    title={t('maintenance.tab.confirmResetTitle')}
+    description={t('maintenance.tab.confirmResetBody')}
+    confirmLabel={t('maintenance.tab.confirmResetYes')}
+    variant="confirm"
+    onConfirm={() => {
+      const tool = pendingToolReset;
+      pendingToolReset = undefined;
+      if (tool !== undefined) void act(() => api.resetTool(deviceId, tool));
+    }}
+  />
 
   <ConfirmDialog
     open={pendingDone !== undefined}

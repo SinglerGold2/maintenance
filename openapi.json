@@ -254,6 +254,63 @@
           }
         }
       }
+    },
+    "/devices/tools/reset": {
+      "post": {
+        "operationId": "reset-tool",
+        "summary": "Start one tool's counter again at zero",
+        "description": "A nozzle was replaced; the printer's own counter does not move, so the tool's hours are anchored where they stand now.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "device_id": {
+                    "type": "string"
+                  },
+                  "tool": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "device_id",
+                  "tool"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The tool that was reset.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "device_id": {
+                      "type": "string"
+                    },
+                    "tool": {
+                      "type": "integer"
+                    },
+                    "hours": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "device_id",
+                    "tool",
+                    "hours"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -442,6 +499,9 @@
             "type": "integer"
           },
           "hours": {
+            "type": "number"
+          },
+          "reset_hours": {
             "type": "number"
           }
         },

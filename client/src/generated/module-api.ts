@@ -24,6 +24,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/modules/com.github.aux.singlergold2.maintenance/devices/tools/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start one tool's counter again at zero
+         * @description A nozzle was replaced; the printer's own counter does not move, so the tool's hours are anchored where they stand now.
+         */
+        post: operations["reset-tool"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/modules/com.github.aux.singlergold2.maintenance/overview": {
         parameters: {
             query?: never;
@@ -168,6 +188,7 @@ export interface components {
         ToolHours: {
             tool: number;
             hours: number;
+            reset_hours?: number;
         };
     };
     responses: never;
@@ -202,6 +223,37 @@ export interface operations {
                 content: {
                     "application/json": {
                         device_id: string;
+                        hours: number;
+                    };
+                };
+            };
+        };
+    };
+    "reset-tool": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    device_id: string;
+                    tool: number;
+                };
+            };
+        };
+        responses: {
+            /** @description The tool that was reset. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        device_id: string;
+                        tool: number;
                         hours: number;
                     };
                 };

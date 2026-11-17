@@ -255,6 +255,7 @@ func routes() http.Handler {
 	mux.HandleFunc("POST /tasks/done", handleDone)
 	mux.HandleFunc("DELETE /tasks", handleDelete)
 	mux.HandleFunc("POST /devices/hours", handlePrinterHours)
+	mux.HandleFunc("POST /devices/tools/reset", handleResetTool)
 	mux.HandleFunc("GET /template", handleTemplate)
 	mux.HandleFunc("POST /template", handleSaveTemplate)
 
@@ -350,6 +351,13 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 		if toolsErr != nil {
 			refuse(w, r, StoreFailed.New("the tool hours could not be read").With(faultString("reason", toolsErr.Error())))
 			return
+		}
+
+		// One tool takes every hour the printer ran: nothing is split, and the
+		// printer's own counter is the honest figure. A multi-tool printer keeps
+		// the share each readable print gave it.
+		if len(toolMap) <= 1 {
+			toolMap = map[int]float64{0: counter}
 		}
 
 		tools := make([]ToolHours, 0, len(toolMap))
@@ -543,6 +551,59 @@ func handleSaveTemplate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	answer(w, http.StatusOK, sent)
+}
+
+func handleResetTool(w http.ResponseWriter, r *http.Request) {
+	st, err := state.store()
+	if err != nil {
+		refuse(w, r, NoDatabase.New("this instance has no database"))
+		return
+	}
+
+	var sent struct {
+		DeviceID string `json:"device_id"`
+		Tool     int    `json:"tool"`
+	}
+
+	if decodeErr := json.NewDecoder(r.Body).Decode(&sent); decodeErr != nil || sent.DeviceID == "" {
+		refuse(w, r, InvalidInput.New("the request names no printer"))
+		return
+	}
+
+	hours, _, hoursErr := state.hoursOf(r.Context(), sent.DeviceID)
+	if hoursErr != nil {
+		refuse(w, r, HistoryFailed.New("the print history could not be read").With(faultString("reason", hoursErr.Error())))
+		return
+	}
+
+	_, offset, known, countsErr := st.PrinterCounts(r.Context(), sent.DeviceID)
+	if countsErr != nil {
+		refuse(w, r, StoreFailed.New("the printer's own hours could not be read").With(faultString("reason", countsErr.Error())))
+		return
+	}
+
+	counter := hours
+	if known && offset >= 0 {
+		counter = hours + offset
+	}
+
+	toolMap, toolErr := st.ToolHours(r.Context(), sent.DeviceID)
+	if toolErr != nil {
+		refuse(w, r, StoreFailed.New("the tool hours could not be read").With(faultString("reason", toolErr.Error())))
+		return
+	}
+
+	at := counter
+	if len(toolMap) > 1 {
+		at = toolMap[sent.Tool]
+	}
+
+	if resetErr := st.ResetTool(r.Context(), sent.DeviceID, sent.Tool, at); resetErr != nil {
+		refuse(w, r, StoreFailed.New("the tool could not be reset").With(faultString("reason", resetErr.Error())))
+		return
+	}
+
+	answer(w, http.StatusOK, map[string]any{"device_id": sent.DeviceID, "tool": sent.Tool, "hours": 0})
 }
 
 func handlePrinterHours(w http.ResponseWriter, r *http.Request) {

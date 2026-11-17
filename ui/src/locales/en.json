@@ -41,5 +41,8 @@
   "maintenance.tab.waiting": "Reading this printer\u2026",
   "maintenance.page.templateNote": "One schedule for every printer. Change an interval here and every printer's task of that name follows; its hours and Done stay on the printer's Maintenance tab.",
   "maintenance.tab.tools": "Print hours per tool",
-  "maintenance.tab.toolsHint": "Split by the filament each tool pushed, read from the G-code of the finished prints. Retractions count towards the tool that made them."
+  "maintenance.tab.toolsHint": "An indication, not a measurement: the print's length split by the filament each tool pushed in the prints whose G-code this module could still read. Retractions count towards the tool that made them.",
+  "maintenance.tab.confirmResetTitle": "Did you change this nozzle?",
+  "maintenance.tab.confirmResetBody": "The tool's counter starts again at zero. The printer's own counter is not touched.",
+  "maintenance.tab.confirmResetYes": "Yes, start again at 0"
 }
