@@ -48,12 +48,21 @@ func Parse(text []byte) Usage {
 		}
 
 		if line[0] == 'T' {
-			if next, err := strconv.Atoi(strings.TrimSpace(line[1:])); err == nil {
-				if next != tool {
-					usage.Changes[next]++
-				}
+			// A tool change carries parameters of its own, as "T0 S1 L2 D0"
+			// does, so only the digits right after the T name the tool.
+			end := 1
+			for end < len(line) && line[end] >= '0' && line[end] <= '9' {
+				end++
+			}
 
-				tool = next
+			if end > 1 {
+				if next, err := strconv.Atoi(line[1:end]); err == nil {
+					if next != tool {
+						usage.Changes[next]++
+					}
+
+					tool = next
+				}
 			}
 
 			continue
@@ -68,6 +77,14 @@ func Parse(text []byte) Usage {
 
 		e, found := numberAfter(line, 'E')
 		if !found {
+			continue
+		}
+
+		// A pure extrude or retract carries E alone; the slicer does not count
+		// that filament as used, and neither does this reader.
+		_, movesX := numberAfter(line, 'X')
+		_, movesY := numberAfter(line, 'Y')
+		if !movesX && !movesY {
 			continue
 		}
 
