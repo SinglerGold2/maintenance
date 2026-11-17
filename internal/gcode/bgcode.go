@@ -147,6 +147,27 @@ func gcodeBlockText(payload []byte, compression uint16, encoding uint16) ([]byte
 	return nil, fmt.Errorf("gcode: encoding %d is not one this reader knows", encoding)
 }
 
+// ParseFile reads a G-code file, text or bgcode, and counts what each tool did.
+// A plain text file is streamed, so its size costs no memory; a bgcode file is
+// decoded first, because its blocks are compressed.
+func ParseFile(reader io.ReaderAt, size int64) (Usage, error) {
+	head := make([]byte, 4)
+	if _, err := reader.ReadAt(head, 0); err != nil && !errors.Is(err, io.EOF) {
+		return Usage{}, err
+	}
+
+	if isBgcode(head) {
+		text, err := ReadAll(reader, size)
+		if err != nil {
+			return Usage{}, err
+		}
+
+		return ParseReader(bytes.NewReader(text)), nil
+	}
+
+	return ParseReader(io.NewSectionReader(reader, 0, size)), nil
+}
+
 // ReadAll reads a G-code file, text or bgcode, into one text buffer.
 func ReadAll(reader io.ReaderAt, size int64) ([]byte, error) {
 	if size > 256<<20 {

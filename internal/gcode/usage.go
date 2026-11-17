@@ -1,6 +1,8 @@
 package gcode
 
 import (
+	"bufio"
+	"io"
 	"strconv"
 	"strings"
 )
@@ -17,6 +19,12 @@ type Usage struct {
 
 // Parse reads the tool changes and the extrusion of a G-code text.
 func Parse(text []byte) Usage {
+	return ParseReader(strings.NewReader(string(text)))
+}
+
+// ParseReader reads the tool changes and the extrusion line by line, so a print
+// of a hundred megabytes costs no more memory than its longest line.
+func ParseReader(reader io.Reader) Usage {
 	usage := Usage{Extrusion: map[int]float64{}, Changes: map[int]int{}}
 
 	tool := 0
@@ -25,8 +33,16 @@ func Parse(text []byte) Usage {
 	seenE := false
 	lastLine := ""
 
-	for _, line := range strings.Split(string(text), "\n") {
-		line = strings.TrimSpace(line)
+	buffered := bufio.NewReaderSize(reader, 1<<20)
+
+	for {
+		raw, err := buffered.ReadString('\n')
+		line := strings.TrimSpace(raw)
+
+		if line == "" && err != nil {
+			break
+		}
+
 		if line == "" || strings.HasPrefix(line, ";") {
 			continue
 		}

@@ -799,14 +799,12 @@ func (m *module) splitJob(ctx context.Context, st *store, files *storageapi.Clie
 
 	fmt.Fprintf(os.Stderr, "%s: print %s: reading %s, %d bytes\n", name, job.ID, job.Path, file.Size())
 
-	text, err := gcode.ReadAll(file, file.Size())
+	usage, err := gcode.ParseFile(file, file.Size())
 	if err != nil {
 		_ = st.MarkJobSeen(ctx, deviceID, job.ID)
 
 		return err
 	}
-
-	usage := gcode.Parse(text)
 	fmt.Fprintf(os.Stderr, "%s: print %s: %d lines, %d tools\n", name, job.ID, usage.Lines, len(usage.Extrusion))
 
 	if usage.Lines == 0 {
