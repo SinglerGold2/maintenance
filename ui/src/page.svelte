@@ -176,19 +176,10 @@
     return 'text-neutral-600';
   }
 
-  function resetTask(deviceID: string, task: TaskView): void {
-    void act(() =>
-      api.saveTask({
-        id: task.id,
-        device_id: deviceID,
-        name: task.name,
-        kind: kindOf(task),
-        interval_hours: num(task.interval_hours),
-        interval_days: num(task.interval_days),
-        material: task.material ?? '',
-        last_done_hours: 0,
-      }),
-    );
+  // Starting over means the interval runs from now, so the counter is anchored
+  // at the hours the printer shows today.
+  function resetTask(_deviceID: string, task: TaskView): void {
+    void act(() => api.markDone(task.id));
   }
 
   function saveTask(deviceID: string, task: TaskView): void {

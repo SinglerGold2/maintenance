@@ -292,6 +292,8 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		counter := hours
+
 		var typed *float64
 		if known {
 			if offset < 0 {
@@ -306,6 +308,7 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			// value in, so both counters move with every print.
 			projected := hours + offset
 			typed = &projected
+			counter = projected
 		}
 
 		views = append(views, DeviceView{
@@ -315,7 +318,7 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			Hours:        round1(hours),
 			Prints:       prints,
 			PrinterHours: typed,
-			Tasks:        state.view(tasks, hours, time.Now()),
+			Tasks:        state.view(tasks, counter, time.Now()),
 		})
 	}
 
@@ -421,7 +424,18 @@ func handleDone(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task.LastDoneHours = hours
+	_, offset, known, countsErr := st.PrinterCounts(r.Context(), task.DeviceID)
+	if countsErr != nil {
+		refuse(w, r, StoreFailed.New("the printer's own hours could not be read").With(faultString("reason", countsErr.Error())))
+		return
+	}
+
+	counter := hours
+	if known && offset >= 0 {
+		counter = hours + offset
+	}
+
+	task.LastDoneHours = counter
 	task.LastDoneAt = time.Now().UTC().Format(time.RFC3339)
 
 	if saveErr := st.Upsert(r.Context(), task); saveErr != nil {

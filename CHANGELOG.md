@@ -3,6 +3,17 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.5.0 - 2026-11-17
+
+### Changed
+
+- A task counts in the printer's own hours, not in what this server has seen.
+  A machine whose display reads 343 hours shows 343 hours of elapsed time on
+  every built-in task, so a 200-hour task reads as due at once, as it should.
+- Done and Start over anchor the next interval at the printer's counter.
+- The built-in tasks start at the printer's zero, because nobody recorded a
+  service on this server before.
+
 ## 0.4.3 - 2026-11-17
 
 ### Fixed
