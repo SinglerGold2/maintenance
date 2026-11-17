@@ -3,6 +3,15 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.3.1 - 2026-11-17
+
+### Changed
+
+- The printer's own counter takes what the machine writes on its display, such
+  as `14d 7h`, and turns it into hours.
+- The interval and material fields stay only on a nozzle task, where they mean
+  something. Other tasks keep their fixed interval.
+
 ## 0.3.0 - 2026-11-17
 
 ### Added

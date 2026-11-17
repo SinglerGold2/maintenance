@@ -31,6 +31,7 @@
   let edits = $state<
     Record<string, { interval: number | undefined; material: string }>
   >({});
+  let printerDrafts = $state<Record<string, string>>({});
 
   function draftAt(deviceID: string): {
     name: string;
@@ -50,6 +51,16 @@
           task.kind === 'hours' ? task.interval_hours : task.interval_days,
         material: task.material ?? '',
       }
+    );
+  }
+
+  function printerDraftAt(device: {
+    id: string;
+    printer_hours?: number;
+  }): string {
+    return (
+      printerDrafts[device.id] ??
+      (device.printer_hours === undefined ? '' : String(device.printer_hours))
     );
   }
 
@@ -101,6 +112,33 @@
 
   function hours(value: number): string {
     return String(Math.round(value * 10) / 10) + ' h';
+  }
+
+  // parseHours reads what a person types for the printer's own counter: 343,
+  // 343h, 14d 7h, 14d7h, 2w 1d 3h. It answers NaN for what it cannot read.
+  function parseHours(text: string): number {
+    const pattern = /(\d+(?:[.,]\d+)?)\s*([wdh])/g;
+    let total = 0;
+    let matched = false;
+    let match = pattern.exec(text.toLowerCase());
+
+    while (match !== null) {
+      const value = Number(match[1]?.replace(',', '.') ?? '0');
+      const unit = match[2];
+
+      if (unit === 'w') total += value * 7 * 24;
+      if (unit === 'd') total += value * 24;
+      if (unit === 'h') total += value;
+
+      matched = true;
+      match = pattern.exec(text.toLowerCase());
+    }
+
+    if (matched) return total;
+
+    const plain = Number(text.trim().replace(',', '.'));
+
+    return Number.isFinite(plain) ? plain : Number.NaN;
   }
 
   function intervalText(task: TaskView): string {
@@ -173,6 +211,17 @@
     });
   }
 
+  function savePrinterHours(deviceID: string): void {
+    const typed = parseHours(printerDraftAt({ id: deviceID }));
+
+    if (!Number.isFinite(typed) || typed < 0) return;
+
+    void act(async () => {
+      await api.savePrinterHours(deviceID, typed);
+      printerDrafts[deviceID] = '';
+    });
+  }
+
   function add(deviceID: string): void {
     const draft = drafts[deviceID];
     if (draft === undefined) return;
@@ -234,6 +283,40 @@
                 {t('maintenance.page.prints')}:
                 {device.prints}
               </p>
+              {#if device.printer_hours !== undefined}
+                <p class="text-neutral-600 text-sm">
+                  {t('maintenance.page.printerSays')}:
+                  <strong>{hours(device.printer_hours)}</strong>
+                  ·
+                  {t('maintenance.page.serverTracked')}:
+                  {hours(device.hours)}
+                </p>
+              {/if}
+              <div class="mt-2 flex flex-wrap items-center gap-2">
+                <Input
+                  value={printerDraftAt(device)}
+                  placeholder={t('maintenance.page.printerHoursPlaceholder')}
+                  aria-label={t('maintenance.page.printerHours')}
+                  class="w-40"
+                  oninput={(event: Event) => {
+                    const target =
+                      event.currentTarget as HTMLInputElement | null;
+                    if (target !== null)
+                      printerDrafts[device.id] = target.value;
+                  }}
+                />
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={busy}
+                  onclick={() => savePrinterHours(device.id)}
+                >
+                  {t('maintenance.page.save')}
+                </Button>
+                <span class="text-neutral-500 text-xs">
+                  {t('maintenance.page.printerHoursHint')}
+                </span>
+              </div>
             </div>
 
             <div class="flex flex-col gap-3">
@@ -288,45 +371,50 @@
                     </div>
                   </div>
 
-                  <div class="flex flex-wrap items-center gap-2">
-                    <Input
-                      type="number"
-                      min="1"
-                      value={edit.interval}
-                      aria-label={t('maintenance.page.interval')}
-                      class="w-24"
-                      oninput={(event: Event) => {
-                        const target =
-                          event.currentTarget as HTMLInputElement | null;
-                        if (target !== null) {
-                          edits[task.id] = {
-                            ...edit,
-                            interval: target.valueAsNumber,
-                          };
-                        }
-                      }}
-                    />
-                    <Input
-                      value={edit.material}
-                      placeholder={t('maintenance.page.materialPlaceholder')}
-                      aria-label={t('maintenance.page.material')}
-                      class="w-48"
-                      oninput={(event: Event) => {
-                        const target =
-                          event.currentTarget as HTMLInputElement | null;
-                        if (target !== null) {
-                          edits[task.id] = { ...edit, material: target.value };
-                        }
-                      }}
-                    />
-                    <Button
-                      size="sm"
-                      disabled={busy}
-                      onclick={() => saveTask(device.id, task)}
-                    >
-                      {t('maintenance.page.save')}
-                    </Button>
-                  </div>
+                  {#if task.material}
+                    <div class="flex flex-wrap items-center gap-2">
+                      <Input
+                        type="number"
+                        min="1"
+                        value={edit.interval}
+                        aria-label={t('maintenance.page.interval')}
+                        class="w-24"
+                        oninput={(event: Event) => {
+                          const target =
+                            event.currentTarget as HTMLInputElement | null;
+                          if (target !== null) {
+                            edits[task.id] = {
+                              ...edit,
+                              interval: target.valueAsNumber,
+                            };
+                          }
+                        }}
+                      />
+                      <Input
+                        value={edit.material}
+                        placeholder={t('maintenance.page.materialPlaceholder')}
+                        aria-label={t('maintenance.page.material')}
+                        class="w-48"
+                        oninput={(event: Event) => {
+                          const target =
+                            event.currentTarget as HTMLInputElement | null;
+                          if (target !== null) {
+                            edits[task.id] = {
+                              ...edit,
+                              material: target.value,
+                            };
+                          }
+                        }}
+                      />
+                      <Button
+                        size="sm"
+                        disabled={busy}
+                        onclick={() => saveTask(device.id, task)}
+                      >
+                        {t('maintenance.page.save')}
+                      </Button>
+                    </div>
+                  {/if}
                 </div>
               {/each}
             </div>

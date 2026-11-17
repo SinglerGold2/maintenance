@@ -15,15 +15,15 @@ export const maintenanceOn = (host: ModuleHost) => {
   const routes = bind(host.client);
 
   return {
-    overview: (signal?: AbortSignal): Promise<Overview> =>
-      routes.readOverview({}, signal),
+    overview: (signal?: AbortSignal): Promise<Overview> => routes.readOverview({}, signal),
     saveTask: (
       body: operations['save-task']['requestBody']['content']['application/json'],
       signal?: AbortSignal,
     ) => routes.saveTask({ body }, signal),
-    markDone: (id: string, signal?: AbortSignal) =>
-      routes.markDone({ body: { id } }, signal),
+    markDone: (id: string, signal?: AbortSignal) => routes.markDone({ body: { id } }, signal),
     deleteTask: (id: string, signal?: AbortSignal) =>
       routes.deleteTask({ query: { id } }, signal),
+    savePrinterHours: (deviceID: string, hours: number, signal?: AbortSignal) =>
+      routes.savePrinterHours({ body: { device_id: deviceID, hours } }, signal),
   };
 };

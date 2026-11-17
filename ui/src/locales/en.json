@@ -22,7 +22,7 @@
   "maintenance.page.add": "Add a task",
   "maintenance.page.printer": "Printer",
   "maintenance.page.choose": "Choose a printer",
-  "maintenance.page.taskPlaceholder": "Such as: check the belts",
+  "maintenance.page.taskPlaceholder": "Check the belts",
   "maintenance.page.hoursUnit": "Print hours",
   "maintenance.page.daysUnit": "Days",
   "maintenance.page.days": "Days",
@@ -30,6 +30,6 @@
   "maintenance.page.printerSays": "The printer shows",
   "maintenance.page.serverTracked": "the server tracked",
   "maintenance.page.printerHours": "Printer hours",
-  "maintenance.page.printerHoursPlaceholder": "Hours from the printer",
-  "maintenance.page.printerHoursHint": "Read the counter on the printer itself, then type it here, so the totals match your machine."
+  "maintenance.page.printerHoursPlaceholder": "14d 7h or 343",
+  "maintenance.page.printerHoursHint": "Type what the printer's own display shows, such as 14d 7h. The tasks keep counting from what the server saw."
 }
