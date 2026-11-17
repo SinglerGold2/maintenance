@@ -37,5 +37,6 @@
   "maintenance.page.confirmDoneYes": "Yes, it is done",
   "maintenance.cards.due.heading": "Maintenance due",
   "maintenance.cards.due.none": "Nothing is due. Every task is inside its interval.",
-  "maintenance.cards.due.loading": "Reading the fleet\u2026"
+  "maintenance.cards.due.loading": "Reading the fleet\u2026",
+  "maintenance.tab.waiting": "Reading this printer\u2026"
 }
