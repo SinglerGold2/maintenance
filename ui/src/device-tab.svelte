@@ -1,5 +1,14 @@
 <script lang="ts">
-  import { Button, ConfirmDialog, Input } from '@prusa/connect-ui/primitives';
+  import {
+    Button,
+    ConfirmDialog,
+    Input,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+  } from '@prusa/connect-ui/primitives';
 
   import { heldHost } from './host';
   import { maintenanceOn, type Overview, type TaskView } from './maintenance';
@@ -15,6 +24,7 @@
   let printerDraft = $state('');
   let pendingDone = $state<TaskView | undefined>();
   let pendingToolReset = $state<number | undefined>();
+  let sets = $state<{ id: string; name: string; enabled: boolean }[]>([]);
 
   const device = $derived(
     overview?.devices.find((entry) => entry.id === deviceId),
@@ -23,10 +33,23 @@
   async function load(): Promise<void> {
     try {
       overview = await api.overview(host.signal);
+      sets = (await api.sets(host.signal)).sets ?? [];
     } catch {
       overview = undefined;
     }
   }
+
+  function assign(setID: string): void {
+    if (setID === '') return;
+
+    void act(() => api.assignSet({ device_id: deviceId, set_id: setID }));
+  }
+
+  const setChoices = $derived(
+    sets
+      .filter((entry) => entry.enabled)
+      .map((entry) => ({ value: entry.id, label: entry.name })),
+  );
 
   async function act(work: () => Promise<unknown>): Promise<void> {
     busy = true;
@@ -124,6 +147,27 @@
   <p class="text-neutral-600 text-sm">{t('maintenance.tab.waiting')}</p>
 {:else}
   <div class="flex flex-col gap-4">
+    <div class="text-neutral-600 flex items-center gap-2 text-sm">
+      <span>{t('maintenance.tab.set')}</span>
+      <Select
+        value={device.set_id ?? ''}
+        items={setChoices}
+        disabled={busy}
+        onValueChange={assign}
+      >
+        <SelectTrigger size="sm" class="w-56">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {#each setChoices as choice (choice.value)}
+            <SelectItem value={choice.value} label={choice.label}>
+              {choice.label}
+            </SelectItem>
+          {/each}
+        </SelectContent>
+      </Select>
+    </div>
+
     <div>
       <p class="text-neutral-600 text-sm">
         {t('maintenance.page.printed')}:

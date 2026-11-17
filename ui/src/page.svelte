@@ -3,7 +3,13 @@
     Button,
     Card,
     CardContent,
+    Input,
     PageHeader,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
   } from '@prusa/connect-ui/primitives';
 
   import { heldHost } from './host';
@@ -14,12 +20,34 @@
   const signal = host.signal;
   const api = maintenanceOn(host);
 
+  type Model = { value: string; label: string };
+
   let sets = $state<Set[]>([]);
   let busy = $state(false);
   let notice = $state('');
   let newName = $state('');
   let newModel = $state('*');
   let expanded = $state<string | undefined>();
+
+  let draftName = $state('');
+  let draftKind = $state('hours');
+  let draftInterval = $state(200);
+  let draftMaterial = $state('');
+
+  const models: Model[] = [
+    { value: '*', label: t('maintenance.page.anyModel') },
+    { value: 'COREONE', label: 'Core One' },
+    { value: 'COREONEL', label: 'Core One L' },
+    { value: 'HT90', label: 'HT90' },
+    { value: 'XL', label: 'XL' },
+    { value: 'MK4S', label: 'MK4S' },
+    { value: 'M3', label: 'M3' },
+  ];
+
+  const kinds: Model[] = [
+    { value: 'hours', label: t('maintenance.page.hours') },
+    { value: 'days', label: t('maintenance.page.days') },
+  ];
 
   $effect(() => {
     void load();
@@ -81,33 +109,29 @@
     });
   }
 
-  function addTask(
-    set: Set,
-    name: string,
-    kind: string,
-    interval: number,
-    material: string,
-  ) {
-    if (name.trim() === '') return;
+  function addTask(set: Set) {
+    if (draftName.trim() === '') return;
 
     void act(() =>
       api.addSetTask(set.id, {
-        name,
-        kind,
-        interval_hours: kind === 'hours' ? interval : 0,
-        interval_days: kind === 'days' ? interval : 0,
-        material,
+        name: draftName,
+        kind: draftKind,
+        interval_hours: draftKind === 'hours' ? draftInterval : 0,
+        interval_days: draftKind === 'days' ? draftInterval : 0,
+        material: draftMaterial,
       }),
-    );
+    ).then(() => {
+      draftName = '';
+      draftMaterial = '';
+    });
   }
 
-  function changeTask(
+  function saveTask(
     set: Set,
     taskID: string,
     name: string,
     kind: string,
     interval: number,
-    material: string,
   ) {
     void act(() =>
       api.updateSetTask(set.id, taskID, {
@@ -115,25 +139,13 @@
         kind,
         interval_hours: kind === 'hours' ? interval : 0,
         interval_days: kind === 'days' ? interval : 0,
-        material,
+        material: '',
       }),
     );
   }
 
   function dropTask(set: Set, taskID: string) {
     void act(() => api.deleteSetTask(set.id, taskID));
-  }
-
-  let draftName = $state('');
-  let draftKind = $state('hours');
-  let draftInterval = $state(200);
-  let draftMaterial = $state('');
-
-  function resetDraft() {
-    draftName = '';
-    draftKind = 'hours';
-    draftInterval = 200;
-    draftMaterial = '';
   }
 </script>
 
@@ -145,23 +157,34 @@
       <p class="text-neutral-600 text-sm">{t('maintenance.page.setsHint')}</p>
 
       <div class="mt-3 flex flex-wrap items-end gap-2">
-        <input
-          class="border-neutral-300 rounded w-60 border px-2 py-1 text-sm"
+        <Input
+          value={newName}
           placeholder={t('maintenance.page.newName')}
-          bind:value={newName}
+          aria-label={t('maintenance.page.newName')}
+          class="w-60"
+          oninput={(event: Event) => {
+            const target = event.currentTarget as HTMLInputElement | null;
+            if (target !== null) newName = target.value;
+          }}
         />
-        <select
-          class="border-neutral-300 rounded border px-2 py-1 text-sm"
-          bind:value={newModel}
+        <Select
+          value={newModel}
+          items={models}
+          onValueChange={(next: string) => {
+            newModel = next;
+          }}
         >
-          <option value="*">{t('maintenance.page.anyModel')}</option>
-          <option value="COREONE">Core One</option>
-          <option value="COREONEL">Core One L</option>
-          <option value="HT90">HT90</option>
-          <option value="XL">XL</option>
-          <option value="MK4S">MK4S</option>
-          <option value="M3">M3</option>
-        </select>
+          <SelectTrigger size="sm" class="w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {#each models as model (model.value)}
+              <SelectItem value={model.value} label={model.label}>
+                {model.label}
+              </SelectItem>
+            {/each}
+          </SelectContent>
+        </Select>
         <Button size="sm" disabled={busy} onclick={create}>
           {t('maintenance.page.newSet')}
         </Button>
@@ -241,44 +264,6 @@
                   {#if task.material}· {task.material}{/if}
                 </span>
                 {#if !set.builtin}
-                  <select
-                    class="border-neutral-300 rounded border px-2 py-1 text-sm"
-                    bind:value={task.kind}
-                  >
-                    <option value="hours">{t('maintenance.page.hours')}</option>
-                    <option value="days">{t('maintenance.page.days')}</option>
-                  </select>
-                  {#if task.kind === 'days'}
-                    <input
-                      class="border-neutral-300 rounded w-24 border px-2 py-1 text-sm"
-                      type="number"
-                      bind:value={task.interval_days}
-                    />
-                  {:else}
-                    <input
-                      class="border-neutral-300 rounded w-24 border px-2 py-1 text-sm"
-                      type="number"
-                      bind:value={task.interval_hours}
-                    />
-                  {/if}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    disabled={busy}
-                    onclick={() =>
-                      changeTask(
-                        set,
-                        task.id,
-                        task.name,
-                        task.kind,
-                        task.kind === 'days'
-                          ? task.interval_days
-                          : task.interval_hours,
-                        task.material ?? '',
-                      )}
-                  >
-                    {t('maintenance.page.save')}
-                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -286,6 +271,23 @@
                     onclick={() => dropTask(set, task.id)}
                   >
                     {t('maintenance.page.remove')}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={busy}
+                    onclick={() =>
+                      saveTask(
+                        set,
+                        task.id,
+                        task.name,
+                        task.kind,
+                        task.kind === 'days'
+                          ? task.interval_days
+                          : task.interval_hours,
+                      )}
+                  >
+                    {t('maintenance.page.save')}
                   </Button>
                 {/if}
               </div>
@@ -295,42 +297,61 @@
               <div
                 class="border-neutral-200 flex flex-wrap items-end gap-2 border-t pt-2"
               >
-                <input
-                  class="border-neutral-300 rounded w-56 border px-2 py-1 text-sm"
+                <Input
+                  value={draftName}
                   placeholder={t('maintenance.page.taskName')}
-                  bind:value={draftName}
+                  aria-label={t('maintenance.page.taskName')}
+                  class="w-56"
+                  oninput={(event: Event) => {
+                    const target =
+                      event.currentTarget as HTMLInputElement | null;
+                    if (target !== null) draftName = target.value;
+                  }}
                 />
-                <select
-                  class="border-neutral-300 rounded border px-2 py-1 text-sm"
-                  bind:value={draftKind}
+                <Select
+                  value={draftKind}
+                  items={kinds}
+                  onValueChange={(next: string) => {
+                    draftKind = next;
+                  }}
                 >
-                  <option value="hours">{t('maintenance.page.hours')}</option>
-                  <option value="days">{t('maintenance.page.days')}</option>
-                </select>
-                <input
-                  class="border-neutral-300 rounded w-24 border px-2 py-1 text-sm"
-                  type="number"
-                  bind:value={draftInterval}
+                  <SelectTrigger size="sm" class="w-28">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {#each kinds as kind (kind.value)}
+                      <SelectItem value={kind.value} label={kind.label}>
+                        {kind.label}
+                      </SelectItem>
+                    {/each}
+                  </SelectContent>
+                </Select>
+                <Input
+                  value={String(draftInterval)}
+                  aria-label={t('maintenance.page.interval')}
+                  class="w-24"
+                  oninput={(event: Event) => {
+                    const target =
+                      event.currentTarget as HTMLInputElement | null;
+                    if (target !== null) draftInterval = Number(target.value);
+                  }}
                 />
-                <input
-                  class="border-neutral-300 rounded w-40 border px-2 py-1 text-sm"
+                <Input
+                  value={draftMaterial}
                   placeholder={t('maintenance.page.material')}
-                  bind:value={draftMaterial}
+                  aria-label={t('maintenance.page.material')}
+                  class="w-40"
+                  oninput={(event: Event) => {
+                    const target =
+                      event.currentTarget as HTMLInputElement | null;
+                    if (target !== null) draftMaterial = target.value;
+                  }}
                 />
                 <Button
                   variant="secondary"
                   size="sm"
                   disabled={busy}
-                  onclick={() => {
-                    addTask(
-                      set,
-                      draftName,
-                      draftKind,
-                      draftInterval,
-                      draftMaterial,
-                    );
-                    resetDraft();
-                  }}
+                  onclick={() => addTask(set)}
                 >
                   {t('maintenance.page.addTask')}
                 </Button>
