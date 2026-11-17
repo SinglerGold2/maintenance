@@ -47,6 +47,7 @@
     { value: 'HT90', label: 'HT90' },
     { value: 'XL', label: 'XL' },
     { value: 'MK4S', label: 'MK4S' },
+    { value: 'MK3', label: 'MK3' },
     { value: 'M3', label: 'M3' },
   ];
 
