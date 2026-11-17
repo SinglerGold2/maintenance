@@ -6,13 +6,13 @@ import type { operations } from "./module-api.js";
 
 /** Every operation the document declares, keyed by its operationId. */
 export const operationTable = {
-  "add-set-task": { id: "add-set-task", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets/{id}/tasks", body: "application/json", response: "none", anonymous: false },
-  "assign-set": { id: "assign-set", method: "PUT", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/devices/set", body: "application/json", response: "none", anonymous: false },
-  "create-set": { id: "create-set", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets", body: "application/json", response: "none", anonymous: false },
+  "add-set-task": { id: "add-set-task", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets/{id}/tasks", body: "application/json", response: "json", anonymous: false },
+  "assign-set": { id: "assign-set", method: "PUT", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/devices/set", body: "application/json", response: "json", anonymous: false },
+  "create-set": { id: "create-set", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets", body: "application/json", response: "json", anonymous: false },
   "delete-set": { id: "delete-set", method: "DELETE", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets/{id}", response: "none", anonymous: false },
   "delete-set-task": { id: "delete-set-task", method: "DELETE", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets/{id}/tasks/{task}", response: "none", anonymous: false },
   "delete-task": { id: "delete-task", method: "DELETE", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/tasks", response: "json", anonymous: false },
-  "list-sets": { id: "list-sets", method: "GET", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets", response: "none", anonymous: false },
+  "list-sets": { id: "list-sets", method: "GET", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets", response: "json", anonymous: false },
   "mark-done": { id: "mark-done", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/tasks/done", body: "application/json", response: "json", anonymous: false },
   "read-overview": { id: "read-overview", method: "GET", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/overview", response: "json", anonymous: false },
   "read-template": { id: "read-template", method: "GET", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/template", response: "json", anonymous: false },
@@ -20,8 +20,8 @@ export const operationTable = {
   "save-printer-hours": { id: "save-printer-hours", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/devices/hours", body: "application/json", response: "json", anonymous: false },
   "save-task": { id: "save-task", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/tasks", body: "application/json", response: "json", anonymous: false },
   "save-template": { id: "save-template", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/template", body: "application/json", response: "json", anonymous: false },
-  "update-set": { id: "update-set", method: "PUT", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets/{id}", body: "application/json", response: "none", anonymous: false },
-  "update-set-task": { id: "update-set-task", method: "PUT", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets/{id}/tasks/{task}", body: "application/json", response: "none", anonymous: false },
+  "update-set": { id: "update-set", method: "PUT", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets/{id}", body: "application/json", response: "json", anonymous: false },
+  "update-set-task": { id: "update-set-task", method: "PUT", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets/{id}/tasks/{task}", body: "application/json", response: "json", anonymous: false },
 } as const satisfies Record<string, Operation>;
 
 /** The routes of module com.github.aux.singlergold2.maintenance, one method per operation, bound to one transport. */
@@ -37,7 +37,7 @@ export interface Operations {
       body: NonNullable<operations["add-set-task"]["requestBody"]>["content"]["application/json"];
     },
     signal?: AbortSignal,
-  ): Promise<void>;
+  ): Promise<operations["add-set-task"]["responses"][201]["content"]["application/json"]>;
 
   /**
    * PUT /api/v1/modules/com.github.aux.singlergold2.maintenance/devices/set
@@ -49,7 +49,7 @@ export interface Operations {
       body: NonNullable<operations["assign-set"]["requestBody"]>["content"]["application/json"];
     },
     signal?: AbortSignal,
-  ): Promise<void>;
+  ): Promise<operations["assign-set"]["responses"][200]["content"]["application/json"]>;
 
   /**
    * POST /api/v1/modules/com.github.aux.singlergold2.maintenance/sets
@@ -61,7 +61,7 @@ export interface Operations {
       body: NonNullable<operations["create-set"]["requestBody"]>["content"]["application/json"];
     },
     signal?: AbortSignal,
-  ): Promise<void>;
+  ): Promise<operations["create-set"]["responses"][201]["content"]["application/json"]>;
 
   /**
    * DELETE /api/v1/modules/com.github.aux.singlergold2.maintenance/sets/{id}
@@ -107,7 +107,7 @@ export interface Operations {
   listSets(
     request?: Record<string, never>,
     signal?: AbortSignal,
-  ): Promise<void>;
+  ): Promise<operations["list-sets"]["responses"][200]["content"]["application/json"]>;
 
   /**
    * POST /api/v1/modules/com.github.aux.singlergold2.maintenance/tasks/done
@@ -200,7 +200,7 @@ export interface Operations {
       body: NonNullable<operations["update-set"]["requestBody"]>["content"]["application/json"];
     },
     signal?: AbortSignal,
-  ): Promise<void>;
+  ): Promise<operations["update-set"]["responses"][200]["content"]["application/json"]>;
 
   /**
    * PUT /api/v1/modules/com.github.aux.singlergold2.maintenance/sets/{id}/tasks/{task}
@@ -213,7 +213,7 @@ export interface Operations {
       body: NonNullable<operations["update-set-task"]["requestBody"]>["content"]["application/json"];
     },
     signal?: AbortSignal,
-  ): Promise<void>;
+  ): Promise<operations["update-set-task"]["responses"][200]["content"]["application/json"]>;
 }
 
 /** bindOperations closes every operation over the transport that sends it. */

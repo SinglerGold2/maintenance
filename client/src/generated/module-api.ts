@@ -378,7 +378,12 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        device_id: string;
+                        set_id: string;
+                    };
+                };
             };
         };
     };
@@ -450,7 +455,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        sets: components["schemas"]["Set"][];
+                    };
+                };
             };
         };
     };
@@ -476,7 +485,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["Set"];
+                };
             };
         };
     };
@@ -504,7 +515,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        sets: components["schemas"]["Set"][];
+                    };
+                };
             };
         };
     };
@@ -554,7 +569,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["SetTask"];
+                };
             };
         };
     };
@@ -585,7 +602,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["SetTask"];
+                };
             };
         };
     };

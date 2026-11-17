@@ -34,5 +34,38 @@ export const maintenanceOn = (host: ModuleHost) => {
       body: operations['save-template']['requestBody']['content']['application/json'],
       signal?: AbortSignal,
     ) => routes.saveTemplate({ body }, signal),
+    sets: (signal?: AbortSignal) => routes.listSets({}, signal),
+    createSet: (
+      body: operations['create-set']['requestBody']['content']['application/json'],
+      signal?: AbortSignal,
+    ) => routes.createSet({ body }, signal),
+    updateSet: (
+      id: string,
+      body: operations['update-set']['requestBody']['content']['application/json'],
+      signal?: AbortSignal,
+    ) => routes.updateSet({ path: { id }, body }, signal),
+    deleteSet: (id: string, signal?: AbortSignal) =>
+      routes.deleteSet({ path: { id } }, signal),
+    addSetTask: (
+      id: string,
+      body: operations['add-set-task']['requestBody']['content']['application/json'],
+      signal?: AbortSignal,
+    ) => routes.addSetTask({ path: { id }, body }, signal),
+    updateSetTask: (
+      id: string,
+      task: string,
+      body: operations['update-set-task']['requestBody']['content']['application/json'],
+      signal?: AbortSignal,
+    ) => routes.updateSetTask({ path: { id, task }, body }, signal),
+    deleteSetTask: (id: string, task: string, signal?: AbortSignal) =>
+      routes.deleteSetTask({ path: { id, task } }, signal),
+    assignSet: (
+      body: operations['assign-set']['requestBody']['content']['application/json'],
+      signal?: AbortSignal,
+    ) => routes.assignSet({ body }, signal),
   };
 };
+
+/** One schedule with its lines. */
+export type Set =
+  operations['list-sets']['responses'][200]['content']['application/json']['sets'][number];

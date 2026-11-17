@@ -345,7 +345,26 @@
         },
         "responses": {
           "200": {
-            "description": "The printer and the schedule it now follows."
+            "description": "The printer and the schedule it now follows.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "device_id": {
+                      "type": "string"
+                    },
+                    "set_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "device_id",
+                    "set_id"
+                  ]
+                }
+              }
+            }
           }
         },
         "description": "Point a printer at a schedule. Its builtin tasks follow that schedule from the next page load on."
@@ -448,7 +467,25 @@
         "summary": "The maintenance schedules",
         "responses": {
           "200": {
-            "description": "Every schedule with its lines."
+            "description": "Every schedule with its lines.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sets": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Set"
+                      }
+                    }
+                  },
+                  "required": [
+                    "sets"
+                  ]
+                }
+              }
+            }
           }
         },
         "description": "Every schedule this module knows, with the lines each one runs."
@@ -482,7 +519,14 @@
         },
         "responses": {
           "201": {
-            "description": "The schedule as it now stands."
+            "description": "The schedule as it now stands.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Set"
+                }
+              }
+            }
           }
         },
         "description": "Write a new schedule, either empty or as a copy of another one."
@@ -528,7 +572,25 @@
         },
         "responses": {
           "200": {
-            "description": "Every schedule with its lines."
+            "description": "Every schedule with its lines.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sets": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Set"
+                      }
+                    }
+                  },
+                  "required": [
+                    "sets"
+                  ]
+                }
+              }
+            }
           }
         },
         "description": "Rename a schedule, point it at another model, or switch it off so no printer may follow it."
@@ -601,7 +663,14 @@
         },
         "responses": {
           "201": {
-            "description": "The line as it now stands."
+            "description": "The line as it now stands.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetTask"
+                }
+              }
+            }
           }
         },
         "description": "Append a line to a schedule. A schedule that ships with this module is refused; copy it and change the copy."
@@ -662,7 +731,14 @@
         },
         "responses": {
           "200": {
-            "description": "The line as it now stands."
+            "description": "The line as it now stands.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetTask"
+                }
+              }
+            }
           }
         },
         "description": "Change one line of a schedule: its name, its interval or the material it covers."
