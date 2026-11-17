@@ -7,3 +7,7 @@
 /bin/
 
 /client/node_modules/
+
+# The build writes these beside the sources; the builder makes them again.
+/maintenance
+/maintenance_*
