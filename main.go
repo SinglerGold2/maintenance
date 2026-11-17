@@ -275,7 +275,7 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	devices, err := state.listDevices(r.Context())
+	devices, err := state.listDevices(r.Context(), routesapi.PrincipalOf(r))
 	if err != nil {
 		refuse(w, r, HistoryFailed.New("the fleet could not be read").With(faultString("reason", err.Error())))
 		return
@@ -284,7 +284,7 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 	views := make([]DeviceView, 0, len(devices))
 
 	for _, device := range devices {
-		hours, prints, hoursErr := state.hoursOf(r.Context(), device.ID)
+		hours, prints, hoursErr := state.hoursOf(r.Context(), device.ID, routesapi.PrincipalOf(r))
 		if hoursErr != nil {
 			refuse(w, r, HistoryFailed.New("the print history could not be read").With(faultString("reason", hoursErr.Error())))
 			return
@@ -343,7 +343,7 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			counter = projected
 		}
 
-		if attributeErr := state.attributeTools(r.Context(), st, device.ID); attributeErr != nil {
+		if attributeErr := state.attributeTools(r.Context(), st, device.ID, routesapi.PrincipalOf(r)); attributeErr != nil {
 			fmt.Fprintf(os.Stderr, "%s: the tools of %s: %v\n", name, device.ID, attributeErr)
 		}
 
@@ -493,7 +493,7 @@ func handleDone(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hours, _, hoursErr := state.hoursOf(r.Context(), task.DeviceID)
+	hours, _, hoursErr := state.hoursOf(r.Context(), task.DeviceID, routesapi.PrincipalOf(r))
 	if hoursErr != nil {
 		refuse(w, r, HistoryFailed.New("the print history could not be read").With(faultString("reason", hoursErr.Error())))
 		return
@@ -585,7 +585,7 @@ func handleResetTool(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hours, _, hoursErr := state.hoursOf(r.Context(), sent.DeviceID)
+	hours, _, hoursErr := state.hoursOf(r.Context(), sent.DeviceID, routesapi.PrincipalOf(r))
 	if hoursErr != nil {
 		refuse(w, r, HistoryFailed.New("the print history could not be read").With(faultString("reason", hoursErr.Error())))
 		return
@@ -643,7 +643,7 @@ func handlePrinterHours(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tracked, _, trackedErr := state.hoursOf(r.Context(), sent.DeviceID)
+	tracked, _, trackedErr := state.hoursOf(r.Context(), sent.DeviceID, routesapi.PrincipalOf(r))
 	if trackedErr != nil {
 		refuse(w, r, HistoryFailed.New("the print history could not be read").With(faultString("reason", trackedErr.Error())))
 		return
@@ -699,7 +699,7 @@ const (
 // attributeTools splits the length of the finished prints this module has not
 // read yet across the tools the G-code names. It reads at most a few files per
 // call, so a page stays quick and the older prints follow on later loads.
-func (m *module) attributeTools(ctx context.Context, st *store, deviceID string) error {
+func (m *module) attributeTools(ctx context.Context, st *store, deviceID, principal string) error {
 	m.mu.Lock()
 	devices := m.devices
 	files := m.storage
@@ -713,7 +713,7 @@ func (m *module) attributeTools(ctx context.Context, st *store, deviceID string)
 	cursor := ""
 
 	for page := 0; page < 5 && read < toolFileLimit; page++ {
-		history, err := devices.JobHistory(ctx, deviceapi.JobHistoryParams{ID: deviceID, Limit: 50, Cursor: cursor})
+		history, err := devices.JobHistory(ctx, deviceapi.JobHistoryParams{Principal: principal, ID: deviceID, Limit: 50, Cursor: cursor})
 		if err != nil {
 			return err
 		}
@@ -843,7 +843,7 @@ func (m *module) alertPercent() int {
 	return m.alert
 }
 
-func (m *module) listDevices(ctx context.Context) ([]deviceapi.Device, error) {
+func (m *module) listDevices(ctx context.Context, principal string) ([]deviceapi.Device, error) {
 	m.mu.Lock()
 	client := m.devices
 	m.mu.Unlock()
@@ -852,7 +852,7 @@ func (m *module) listDevices(ctx context.Context) ([]deviceapi.Device, error) {
 		return nil, errors.New("no device client")
 	}
 
-	page, err := client.List(ctx, deviceapi.ListParams{Limit: 100})
+	page, err := client.List(ctx, deviceapi.ListParams{Principal: principal, Limit: 100})
 	if err != nil {
 		return nil, err
 	}
@@ -862,9 +862,10 @@ func (m *module) listDevices(ctx context.Context) ([]deviceapi.Device, error) {
 
 // hoursOf sums the length of every ended print of one device. The result is
 // held for a few minutes, because a page load asks for it once per device.
-func (m *module) hoursOf(ctx context.Context, deviceID string) (float64, int, error) {
+func (m *module) hoursOf(ctx context.Context, deviceID, principal string) (float64, int, error) {
 	m.cacheMu.Lock()
-	cached, found := m.cache[deviceID]
+	key := principal + "/" + deviceID
+	cached, found := m.cache[key]
 	m.cacheMu.Unlock()
 
 	if found && time.Since(cached.calculated) < hoursTTL {
@@ -886,7 +887,7 @@ func (m *module) hoursOf(ctx context.Context, deviceID string) (float64, int, er
 	)
 
 	for page := 0; page < 50; page++ {
-		history, err := client.JobHistory(ctx, deviceapi.JobHistoryParams{ID: deviceID, Limit: 200, Cursor: cursor})
+		history, err := client.JobHistory(ctx, deviceapi.JobHistoryParams{Principal: principal, ID: deviceID, Limit: 200, Cursor: cursor})
 		if err != nil {
 			return 0, 0, err
 		}
@@ -913,7 +914,7 @@ func (m *module) hoursOf(ctx context.Context, deviceID string) (float64, int, er
 	}
 
 	m.cacheMu.Lock()
-	m.cache[deviceID] = hoursEntry{hours: total, prints: prints, calculated: time.Now()}
+	m.cache[key] = hoursEntry{hours: total, prints: prints, calculated: time.Now()}
 	m.cacheMu.Unlock()
 
 	return total, prints, nil
