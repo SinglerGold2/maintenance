@@ -70,6 +70,20 @@ Then restart the server. It unpacks the bundle into
 The `.exe` files in a release are the module's own program, which the server
 starts as a child process, not installers.
 
+A release carries one program per platform, named after it:
+
+| File | Runs on |
+| --- | --- |
+| `maintenance_linux_amd64` | Linux, x86-64 |
+| `maintenance_linux_arm64` | Linux on ARM 64, such as a Raspberry Pi |
+| `maintenance_darwin_arm64` | macOS on Apple silicon |
+| `maintenance_windows_amd64.exe` | Windows, x86-64 |
+
+These are the module's own program, which the server starts as a child process;
+they are not installers. The signed `.tar.gz` carries the same programs plus
+`module.yaml`, the browser bundle and the checksums, and that is what an
+installation takes.
+
 The module asks for the fleet, the print history, `read_storage` for the G-code,
 and a database of its own. The service runs as the Docker container
 `prusa-connect-local` on port 8090.
