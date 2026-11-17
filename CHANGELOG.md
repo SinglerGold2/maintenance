@@ -3,6 +3,13 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.3.4 - 2026-11-17
+
+### Fixed
+
+- A printer whose tasks were removed by 0.3.3 gets its default schedule written
+  again on the next load, once.
+
 ## 0.3.3 - 2026-11-17
 
 ### Fixed
