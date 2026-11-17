@@ -3,6 +3,16 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.3.3 - 2026-11-17
+
+### Fixed
+
+- The default schedule is written with the printer's id. Earlier releases wrote
+  it without, so the tasks belonged to no printer and every load wrote them
+  again. The rows that belonged to no printer are removed.
+- The field for a new task shows a real example, `e.g. fasten all screws`, and
+  starts at 1,000 hours.
+
 ## 0.3.2 - 2026-11-17
 
 ### Fixed

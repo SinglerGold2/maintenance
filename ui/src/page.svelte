@@ -38,7 +38,7 @@
     kind: 'hours' | 'days';
     interval: number | undefined;
   } {
-    return drafts[deviceID] ?? { name: '', kind: 'hours', interval: 200 };
+    return drafts[deviceID] ?? { name: '', kind: 'hours', interval: 1000 };
   }
 
   function editAt(task: TaskView): {
@@ -71,7 +71,7 @@
       fault = undefined;
 
       for (const device of answer.devices) {
-        drafts[device.id] ??= { name: '', kind: 'hours', interval: 200 };
+        drafts[device.id] ??= { name: '', kind: 'hours', interval: 1000 };
       }
     } catch (thrown: unknown) {
       if (!host.signal.aborted) fault = describeFault(thrown);

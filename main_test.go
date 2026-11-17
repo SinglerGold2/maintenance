@@ -10,7 +10,7 @@ import (
 func TestDefaultsForCoreOneHoldsThePrusaSchedule(t *testing.T) {
 	t.Parallel()
 
-	tasks := defaultsFor("COREONE", time.Now())
+	tasks := defaultsFor("COREONE", "device-1", time.Now())
 	if len(tasks) != 4 {
 		t.Fatalf("the CORE One needs 4 default tasks, got %d", len(tasks))
 	}
@@ -35,7 +35,7 @@ func TestDefaultsForCoreOneHoldsThePrusaSchedule(t *testing.T) {
 func TestAnUnknownModelStillGetsOneTask(t *testing.T) {
 	t.Parallel()
 
-	if got := defaultsFor("MK4S", time.Now()); len(got) != 1 {
+	if got := defaultsFor("MK4S", "device-2", time.Now()); len(got) != 1 {
 		t.Fatalf("an unknown model gets one task, got %d", len(got))
 	}
 }

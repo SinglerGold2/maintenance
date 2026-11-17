@@ -277,7 +277,7 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if first {
-				tasks = defaultsFor(device.Model, time.Now().UTC())
+				tasks = defaultsFor(device.Model, device.ID, time.Now().UTC())
 				if seedErr = st.Insert(r.Context(), tasks); seedErr != nil {
 					refuse(w, r, StoreFailed.New("the default tasks could not be written").With(faultString("reason", seedErr.Error())))
 					return
@@ -619,21 +619,21 @@ func (m *module) view(tasks []Task, hours float64, now time.Time) []TaskView {
 // defaultsFor is the maintenance schedule Prusa publishes for a model. The
 // numbers are from the Prusa Knowledge Base article on regular printer
 // maintenance.
-func defaultsFor(model string, now time.Time) []Task {
+func defaultsFor(model, deviceID string, now time.Time) []Task {
 	upper := strings.ToUpper(strings.ReplaceAll(model, " ", ""))
 	stamp := now.Format(time.RFC3339)
 
 	if !strings.Contains(upper, "COREONE") {
 		return []Task{
-			{ID: newID(), Name: "Inspect the machine", Kind: "hours", IntervalHours: 200, LastDoneAt: stamp},
+			{ID: newID(), DeviceID: deviceID, Name: "Inspect the machine", Kind: "hours", IntervalHours: 200, LastDoneAt: stamp},
 		}
 	}
 
 	return []Task{
-		{ID: newID(), Name: "Check axes, belts, fans and extruder", Kind: "hours", IntervalHours: 200, LastDoneAt: stamp},
-		{ID: newID(), Name: "Inspect the electrical connectors", Kind: "hours", IntervalHours: 600, LastDoneAt: stamp},
-		{ID: newID(), Name: "Lubricate the linear rail", Kind: "days", IntervalDays: 90, LastDoneAt: stamp},
-		{ID: newID(), Name: "Check the nozzle, replace when worn", Kind: "hours", IntervalHours: 5000, LastDoneAt: stamp, Material: "hardened steel"},
+		{ID: newID(), DeviceID: deviceID, Name: "Check axes, belts, fans and extruder", Kind: "hours", IntervalHours: 200, LastDoneAt: stamp},
+		{ID: newID(), DeviceID: deviceID, Name: "Inspect the electrical connectors", Kind: "hours", IntervalHours: 600, LastDoneAt: stamp},
+		{ID: newID(), DeviceID: deviceID, Name: "Lubricate the linear rail", Kind: "days", IntervalDays: 90, LastDoneAt: stamp},
+		{ID: newID(), DeviceID: deviceID, Name: "Check the nozzle, replace when worn", Kind: "hours", IntervalHours: 5000, LastDoneAt: stamp, Material: "hardened steel"},
 	}
 }
 

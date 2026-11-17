@@ -22,7 +22,7 @@
   "maintenance.page.add": "Add a task",
   "maintenance.page.printer": "Printer",
   "maintenance.page.choose": "Choose a printer",
-  "maintenance.page.taskPlaceholder": "Check the belts",
+  "maintenance.page.taskPlaceholder": "e.g. fasten all screws",
   "maintenance.page.hoursUnit": "Print hours",
   "maintenance.page.daysUnit": "Days",
   "maintenance.page.days": "Days",
