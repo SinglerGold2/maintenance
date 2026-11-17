@@ -3,6 +3,79 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.9.2 - 2026-11-17
+
+### Fixed
+
+- The release workflow is valid YAML again: the named signing secret sits beside
+  `with`, not inside it.
+
+### Changed
+
+- README: what to do after installing, step by step, and how the hours are
+  counted.
+
+## 0.9.1 - 2026-11-17
+
+### Fixed
+
+- The release workflow hands the signing key to the marketplace's publish
+  workflow by name. It inherited its secrets before, and an inherited secret
+  does not cross an organisation boundary.
+
+## 0.9.0 - 2026-11-17
+
+### Changed
+
+- The Maintenance page is one schedule for the whole fleet: four lines, no
+  printer, no counters. Changing an interval there carries it to every built-in
+  task of that name on every printer.
+- `GET /template` and `POST /template` carry that schedule. A printer that joins
+  the server takes its tasks from the template.
+
+## 0.8.2 - 2026-11-17
+
+### Changed
+
+- The Maintenance page is about intervals alone: no counter, no printer hours
+  field, no material field. The printer's own numbers live on its Maintenance
+  tab.
+
+## 0.8.1 - 2026-11-17
+
+### Fixed
+
+- The manifest declares the printer tab and the dashboard card the bundle
+  registers. Without them the host refused the module as undeclared.
+
+## 0.8.0 - 2026-11-17
+
+### Added
+
+- Every printer page carries a Maintenance tab of its own, with that printer's
+  counter and tasks alone.
+
+## 0.7.0 - 2026-11-17
+
+### Added
+
+- A dashboard card, Maintenance due, lists every task that is due now or due
+  soon, with its printer.
+
+## 0.6.1 - 2026-11-17
+
+### Added
+
+- Done asks first: a dialog names the task and says the counter starts again at
+  the printer's current hours.
+
+## 0.6.0 - 2026-11-17
+
+### Added
+
+- The module publishes `maintenance.task` on the event bus when a task reaches
+  due soon or due, once per change.
+
 ## 0.5.0 - 2026-11-17
 
 ### Changed
