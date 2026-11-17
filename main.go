@@ -1043,8 +1043,6 @@ func (m *module) attributeTools(ctx context.Context, st *store, deviceID, princi
 		return nil
 	}
 
-	fmt.Fprintf(os.Stderr, "%s: tools of %s: starting\n", name, deviceID)
-
 	read := 0
 	cursor := ""
 
@@ -1053,8 +1051,6 @@ func (m *module) attributeTools(ctx context.Context, st *store, deviceID, princi
 		if err != nil {
 			return err
 		}
-
-		fmt.Fprintf(os.Stderr, "%s: tools of %s: %d prints in the page\n", name, deviceID, len(history.Items))
 
 		for _, job := range history.Items {
 			if job.Ended == nil || job.Path == "" {
@@ -1131,16 +1127,12 @@ func (m *module) splitJob(ctx context.Context, st *store, files *storageapi.Clie
 		return fmt.Errorf("the file is %d bytes, larger than the %d this module reads", file.Size(), maxToolFile)
 	}
 
-	fmt.Fprintf(os.Stderr, "%s: print %s: reading %s, %d bytes\n", name, job.ID, job.Path, file.Size())
-
 	usage, err := gcode.ParseFile(file, file.Size())
 	if err != nil {
 		_ = st.MarkJobSeen(ctx, deviceID, job.ID)
 
 		return err
 	}
-	fmt.Fprintf(os.Stderr, "%s: print %s: %d lines, %d tools\n", name, job.ID, usage.Lines, len(usage.Extrusion))
-
 	if usage.Lines == 0 {
 		return nil
 	}
@@ -1155,8 +1147,6 @@ func (m *module) splitJob(ctx context.Context, st *store, files *storageapi.Clie
 	}
 
 	length := job.Ended.Sub(job.Started).Hours()
-	fmt.Fprintf(os.Stderr, "%s: print %s: %d mm, %.4f hours\n", name, job.ID, int(total), length)
-
 	if length <= 0 {
 		return nil
 	}
@@ -1237,8 +1227,6 @@ func (m *module) hoursOf(ctx context.Context, deviceID, principal string) (float
 		if err != nil {
 			return 0, 0, err
 		}
-
-		fmt.Fprintf(os.Stderr, "%s: tools of %s: %d prints in the page\n", name, deviceID, len(history.Items))
 
 		for _, job := range history.Items {
 			if job.Ended == nil || job.Started.IsZero() {
