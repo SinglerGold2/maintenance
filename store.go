@@ -137,6 +137,59 @@ func (s *store) SetPrinterHours(ctx context.Context, deviceID string, printerHou
 	return err
 }
 
+// TemplateTask is one line of the schedule that every printer starts with.
+type TemplateTask struct {
+	ID            string  `json:"id"`
+	Name          string  `json:"name"`
+	Kind          string  `json:"kind"`
+	IntervalHours float64 `json:"interval_hours"`
+	IntervalDays  int     `json:"interval_days"`
+	Material      string  `json:"material,omitempty"`
+	Position      int     `json:"position"`
+}
+
+func (s *store) Template(ctx context.Context) ([]TemplateTask, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, name, kind, interval_hours, interval_days,
+        material, position FROM maintenance_template ORDER BY position`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var out []TemplateTask
+
+	for rows.Next() {
+		var task TemplateTask
+		if err := rows.Scan(&task.ID, &task.Name, &task.Kind, &task.IntervalHours,
+			&task.IntervalDays, &task.Material, &task.Position); err != nil {
+			return nil, err
+		}
+
+		out = append(out, task)
+	}
+
+	return out, rows.Err()
+}
+
+// UpdateTemplate writes one line of the schedule and carries it to every
+// built-in task of that name, keeping each printer's own counter.
+func (s *store) UpdateTemplate(ctx context.Context, task TemplateTask) error {
+	update := fmt.Sprintf(`UPDATE maintenance_template SET interval_hours = %s, interval_days = %s,
+        material = %s WHERE id = %s`, s.place(1), s.place(2), s.place(3), s.place(4))
+
+	if _, err := s.db.ExecContext(ctx, update, task.IntervalHours, task.IntervalDays, task.Material, task.ID); err != nil {
+		return err
+	}
+
+	apply := fmt.Sprintf(`UPDATE maintenance_tasks SET interval_hours = %s, interval_days = %s,
+        material = %s WHERE builtin = %s AND name = %s`,
+		s.place(1), s.place(2), s.place(3), s.place(4), s.place(5))
+
+	_, err := s.db.ExecContext(ctx, apply, task.IntervalHours, task.IntervalDays, task.Material, true, task.Name)
+
+	return err
+}
+
 // MarkSeeded answers whether this call is the one that seeds the printer's
 // schedule. The first caller wins and every later one is told no.
 func (s *store) MarkSeeded(ctx context.Context, deviceID string) (bool, error) {

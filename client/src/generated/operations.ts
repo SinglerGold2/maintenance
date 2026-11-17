@@ -9,8 +9,10 @@ export const operationTable = {
   "delete-task": { id: "delete-task", method: "DELETE", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/tasks", response: "json", anonymous: false },
   "mark-done": { id: "mark-done", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/tasks/done", body: "application/json", response: "json", anonymous: false },
   "read-overview": { id: "read-overview", method: "GET", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/overview", response: "json", anonymous: false },
+  "read-template": { id: "read-template", method: "GET", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/template", response: "json", anonymous: false },
   "save-printer-hours": { id: "save-printer-hours", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/devices/hours", body: "application/json", response: "json", anonymous: false },
   "save-task": { id: "save-task", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/tasks", body: "application/json", response: "json", anonymous: false },
+  "save-template": { id: "save-template", method: "POST", path: "/api/v1/modules/com.github.aux.singlergold2.maintenance/template", body: "application/json", response: "json", anonymous: false },
 } as const satisfies Record<string, Operation>;
 
 /** The routes of module com.github.aux.singlergold2.maintenance, one method per operation, bound to one transport. */
@@ -50,6 +52,16 @@ export interface Operations {
   ): Promise<operations["read-overview"]["responses"][200]["content"]["application/json"]>;
 
   /**
+   * GET /api/v1/modules/com.github.aux.singlergold2.maintenance/template
+   *
+   * The schedule every printer starts with
+   */
+  readTemplate(
+    request?: Record<string, never>,
+    signal?: AbortSignal,
+  ): Promise<operations["read-template"]["responses"][200]["content"]["application/json"]>;
+
+  /**
    * POST /api/v1/modules/com.github.aux.singlergold2.maintenance/devices/hours
    *
    * Record the print hours the machine's own display shows
@@ -72,6 +84,18 @@ export interface Operations {
     },
     signal?: AbortSignal,
   ): Promise<operations["save-task"]["responses"][200]["content"]["application/json"]>;
+
+  /**
+   * POST /api/v1/modules/com.github.aux.singlergold2.maintenance/template
+   *
+   * Change one line of the schedule
+   */
+  saveTemplate(
+    request: {
+      body: NonNullable<operations["save-template"]["requestBody"]>["content"]["application/json"];
+    },
+    signal?: AbortSignal,
+  ): Promise<operations["save-template"]["responses"][200]["content"]["application/json"]>;
 }
 
 /** bindOperations closes every operation over the transport that sends it. */
@@ -80,7 +104,9 @@ export function bindOperations(transport: Transport): Operations {
     deleteTask: (request, signal) => transport.call(operationTable["delete-task"], request, signal),
     markDone: (request, signal) => transport.call(operationTable["mark-done"], request, signal),
     readOverview: (request = {}, signal) => transport.call(operationTable["read-overview"], request, signal),
+    readTemplate: (request = {}, signal) => transport.call(operationTable["read-template"], request, signal),
     savePrinterHours: (request, signal) => transport.call(operationTable["save-printer-hours"], request, signal),
     saveTask: (request, signal) => transport.call(operationTable["save-task"], request, signal),
+    saveTemplate: (request, signal) => transport.call(operationTable["save-template"], request, signal),
   };
 }

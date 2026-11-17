@@ -27,5 +27,10 @@ export const maintenanceOn = (host: ModuleHost) => {
       routes.deleteTask({ query: { id } }, signal),
     savePrinterHours: (deviceID: string, hours: number, signal?: AbortSignal) =>
       routes.savePrinterHours({ body: { device_id: deviceID, hours } }, signal),
+    template: (signal?: AbortSignal) => routes.readTemplate({}, signal),
+    saveTemplate: (
+      body: operations['save-template']['requestBody']['content']['application/json'],
+      signal?: AbortSignal,
+    ) => routes.saveTemplate({ body }, signal),
   };
 };

@@ -241,6 +241,8 @@ func routes() http.Handler {
 	mux.HandleFunc("POST /tasks/done", handleDone)
 	mux.HandleFunc("DELETE /tasks", handleDelete)
 	mux.HandleFunc("POST /devices/hours", handlePrinterHours)
+	mux.HandleFunc("GET /template", handleTemplate)
+	mux.HandleFunc("POST /template", handleSaveTemplate)
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		refuse(w, r, RouteNotFound.
@@ -287,7 +289,13 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if first {
-				tasks = defaultsFor(device.Model, device.ID, time.Now().UTC())
+				schedule, tplErr := st.Template(r.Context())
+				if tplErr != nil {
+					refuse(w, r, StoreFailed.New("the schedule could not be read").With(faultString("reason", tplErr.Error())))
+					return
+				}
+
+				tasks = tasksFrom(schedule, device.ID, time.Now().UTC())
 				if seedErr = st.Insert(r.Context(), tasks); seedErr != nil {
 					refuse(w, r, StoreFailed.New("the default tasks could not be written").With(faultString("reason", seedErr.Error())))
 					return
@@ -456,6 +464,53 @@ func handleDone(w http.ResponseWriter, r *http.Request) {
 	}
 
 	answer(w, http.StatusOK, task)
+}
+
+func handleTemplate(w http.ResponseWriter, r *http.Request) {
+	st, err := state.store()
+	if err != nil {
+		refuse(w, r, NoDatabase.New("this instance has no database"))
+		return
+	}
+
+	tasks, listErr := st.Template(r.Context())
+	if listErr != nil {
+		refuse(w, r, StoreFailed.New("the schedule could not be read").With(faultString("reason", listErr.Error())))
+		return
+	}
+
+	answer(w, http.StatusOK, map[string]any{"tasks": tasks, "alert_percent": state.alertPercent()})
+}
+
+func handleSaveTemplate(w http.ResponseWriter, r *http.Request) {
+	st, err := state.store()
+	if err != nil {
+		refuse(w, r, NoDatabase.New("this instance has no database"))
+		return
+	}
+
+	var sent TemplateTask
+	if decodeErr := json.NewDecoder(r.Body).Decode(&sent); decodeErr != nil || sent.ID == "" {
+		refuse(w, r, InvalidInput.New("the request names no schedule line"))
+		return
+	}
+
+	if sent.Kind == "hours" && sent.IntervalHours <= 0 {
+		refuse(w, r, InvalidInput.New("an hours task needs a positive interval"))
+		return
+	}
+
+	if sent.Kind == "days" && sent.IntervalDays <= 0 {
+		refuse(w, r, InvalidInput.New("a days task needs a positive interval"))
+		return
+	}
+
+	if saveErr := st.UpdateTemplate(r.Context(), sent); saveErr != nil {
+		refuse(w, r, StoreFailed.New("the schedule could not be written").With(faultString("reason", saveErr.Error())))
+		return
+	}
+
+	answer(w, http.StatusOK, sent)
 }
 
 func handlePrinterHours(w http.ResponseWriter, r *http.Request) {
@@ -669,6 +724,28 @@ func (m *module) view(tasks []Task, hours float64, now time.Time) []TaskView {
 	}
 
 	return views
+}
+
+// tasksFrom turns the schedule template into the tasks of one printer.
+func tasksFrom(schedule []TemplateTask, deviceID string, now time.Time) []Task {
+	stamp := now.Format(time.RFC3339)
+	out := make([]Task, 0, len(schedule))
+
+	for _, line := range schedule {
+		out = append(out, Task{
+			ID:            newID(),
+			DeviceID:      deviceID,
+			Name:          line.Name,
+			Kind:          line.Kind,
+			IntervalHours: line.IntervalHours,
+			IntervalDays:  line.IntervalDays,
+			Material:      line.Material,
+			LastDoneAt:    stamp,
+			Builtin:       true,
+		})
+	}
+
+	return out
 }
 
 // defaultsFor is the maintenance schedule Prusa publishes for a model. The

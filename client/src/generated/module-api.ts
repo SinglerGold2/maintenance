@@ -88,6 +88,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/modules/com.github.aux.singlergold2.maintenance/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The schedule every printer starts with
+         * @description One line per maintenance task, with the interval an operator sets once for the fleet.
+         */
+        get: operations["read-template"];
+        put?: never;
+        /**
+         * Change one line of the schedule
+         * @description Carries the new interval to every built-in task of that name, keeping each printer's own counter.
+         */
+        post: operations["save-template"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -129,6 +153,16 @@ export interface components {
             prints: number;
             tasks: components["schemas"]["TaskView"][];
             printer_hours?: number;
+        };
+        TemplateTask: {
+            id: string;
+            name: string;
+            /** @enum {string} */
+            kind: "hours" | "days";
+            interval_hours?: number;
+            interval_days?: number;
+            material?: string;
+            position?: number;
         };
     };
     responses: never;
@@ -262,6 +296,53 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Task"];
+                };
+            };
+        };
+    };
+    "read-template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The schedule. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        alert_percent: number;
+                        tasks: components["schemas"]["TemplateTask"][];
+                    };
+                };
+            };
+        };
+    };
+    "save-template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TemplateTask"];
+            };
+        };
+        responses: {
+            /** @description The line as it was written. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateTask"];
                 };
             };
         };

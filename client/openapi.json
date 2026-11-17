@@ -136,6 +136,41 @@
           "prints",
           "tasks"
         ]
+      },
+      "TemplateTask": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "hours",
+              "days"
+            ]
+          },
+          "interval_hours": {
+            "type": "number"
+          },
+          "interval_days": {
+            "type": "integer"
+          },
+          "material": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "kind"
+        ]
       }
     }
   },
@@ -332,6 +367,67 @@
           }
         },
         "description": "Mark a task done: its counter starts again at the printer's current print hours."
+      }
+    },
+    "/api/v1/modules/com.github.aux.singlergold2.maintenance/template": {
+      "get": {
+        "operationId": "read-template",
+        "summary": "The schedule every printer starts with",
+        "description": "One line per maintenance task, with the interval an operator sets once for the fleet.",
+        "responses": {
+          "200": {
+            "description": "The schedule.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "alert_percent": {
+                      "type": "integer"
+                    },
+                    "tasks": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TemplateTask"
+                      }
+                    }
+                  },
+                  "required": [
+                    "alert_percent",
+                    "tasks"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "save-template",
+        "summary": "Change one line of the schedule",
+        "description": "Carries the new interval to every built-in task of that name, keeping each printer's own counter.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateTask"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The line as it was written.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateTask"
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
