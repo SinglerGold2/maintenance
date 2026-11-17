@@ -4,6 +4,7 @@
     Card,
     CardContent,
     Input,
+    Label,
     PageHeader,
     RadioGroup,
     RadioGroupItem,
@@ -315,12 +316,12 @@
                               value={material.value}
                               id={`${task.id ?? set.id}-${material.value}`}
                             />
-                            <label
+                            <Label
+                              variant="option"
                               for={`${task.id ?? set.id}-${material.value}`}
-                              class="text-sm"
                             >
                               {material.label}
-                            </label>
+                            </Label>
                           </span>
                         {/each}
                       </div>
