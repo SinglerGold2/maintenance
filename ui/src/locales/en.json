@@ -75,5 +75,5 @@
   "maintenance.page.materialStainlessSteel": "Stainless steel",
   "maintenance.page.materialSiliconCarbide": "Silicon carbide",
   "maintenance.page.materialTungstenCarbide": "Tungsten carbide",
-  "maintenance.page.abrasiveHint": "Carbon and glass filled filaments wear most nozzles down fast. Brass, stainless steel and plated copper are marked red because they are not made for them; hardened steel, bimetal, silicon carbide, tungsten carbide and ruby last."
+  "maintenance.page.abrasiveHint": "Carbon and glass filled filaments wear most nozzles down fast. Brass, stainless steel and plated copper are printed in bold italic because they are not made for them; hardened steel, bimetal, silicon carbide, tungsten carbide and ruby last."
 }

@@ -359,7 +359,7 @@
                               />
                               <Label
                                 variant="option"
-                                class="text-red-500"
+                                class="font-bold italic"
                                 for={`${task.id ?? set.id}-${material.value}`}
                               >
                                 {material.label}
