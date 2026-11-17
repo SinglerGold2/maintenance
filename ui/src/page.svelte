@@ -54,6 +54,10 @@
   const nozzleMaterials: Model[] = [
     { value: 'brass', label: t('maintenance.page.materialBrass') },
     {
+      value: 'stainless steel',
+      label: t('maintenance.page.materialStainlessSteel'),
+    },
+    {
       value: 'plated copper',
       label: t('maintenance.page.materialPlatedCopper'),
     },
@@ -62,6 +66,14 @@
       label: t('maintenance.page.materialHardenedSteel'),
     },
     { value: 'bimetal', label: t('maintenance.page.materialBimetal') },
+    {
+      value: 'silicon carbide',
+      label: t('maintenance.page.materialSiliconCarbide'),
+    },
+    {
+      value: 'tungsten carbide',
+      label: t('maintenance.page.materialTungstenCarbide'),
+    },
     { value: 'ruby/diamond', label: t('maintenance.page.materialRubyDiamond') },
   ];
 

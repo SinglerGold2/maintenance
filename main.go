@@ -819,11 +819,14 @@ var nozzleInterval = map[string]struct {
 	hours float64
 	days  int
 }{
-	"brass":          {hours: 500},
-	"plated copper":  {hours: 800},
-	"hardened steel": {hours: 1500},
-	"bimetal":        {hours: 1700},
-	"ruby/diamond":   {hours: 5000},
+	"brass":            {hours: 500},
+	"stainless steel":  {hours: 700},
+	"plated copper":    {hours: 800},
+	"hardened steel":   {hours: 1500},
+	"bimetal":          {hours: 1700},
+	"silicon carbide":  {hours: 2500},
+	"tungsten carbide": {hours: 3000},
+	"ruby/diamond":     {hours: 5000},
 }
 
 func (b setTaskBody) task() (SetTask, error) {
@@ -841,7 +844,7 @@ func (b setTaskBody) task() (SetTask, error) {
 	case "nozzle":
 		life, known := nozzleInterval[strings.ToLower(task.Material)]
 		if !known {
-			return task, errors.New("a nozzle task names its material: brass, plated copper, hardened steel, bimetal or ruby/diamond")
+			return task, errors.New("a nozzle task names its material: brass, stainless steel, plated copper, hardened steel, bimetal, silicon carbide, tungsten carbide or ruby/diamond")
 		}
 
 		task.Material = strings.ToLower(task.Material)
