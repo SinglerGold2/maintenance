@@ -28,9 +28,12 @@ printer's current hours. Tasks that ship with the module cannot be removed, the
 ones you add can.
 
 Each printer's tab also says how many hours each tool ran, read from the G-code
-of finished prints (`.gcode` and `.bgcode`, deflate, heatshrink and MeatPack).
-Treat that figure as an indication, not a measurement. Each tool can be reset
-after a nozzle change, without touching the printer's counter.
+of finished prints: `.gcode` and `.bgcode`, deflate, heatshrink and MeatPack
+included. The print's length is split by the filament each tool pushed, and the
+figure is an indication, not a measurement; the tab says so too. Each tool
+carries its own **Start over at 0**, so a nozzle change resets that tool alone
+and the printer's counter stays where it is. Times show as `5h 4m 33s`, and a
+print of a few seconds shows seconds rather than a rounded zero.
 
 A dashboard card, **Maintenance due**, lists what is due across the fleet, and
 the module publishes `maintenance.task` on the event bus when a task reaches due
@@ -44,10 +47,10 @@ The marketplace is the normal way. To install a release yourself:
 
 ```bash
 # the signed bundle from the GitHub release
-docker cp maintenance-0.10.10.tar.gz prusa-connect-local:/tmp/
+docker cp maintenance-0.10.19.tar.gz prusa-connect-local:/tmp/
 docker exec -w /app prusa-connect-local /app/prusa_connect_local \
-  module add github.com/singlergold2/maintenance@0.10.10 \
-  -from /tmp/maintenance-0.10.10.tar.gz -approve -database sqlite
+  module add github.com/singlergold2/maintenance@0.10.19 \
+  -from /tmp/maintenance-0.10.19.tar.gz -approve -database sqlite
 docker restart prusa-connect-local
 ```
 
@@ -61,8 +64,8 @@ release:
 
 ```powershell
 cd C:\prusa-connect
-.\prusa_connect_windows_amd64.exe module add github.com/singlergold2/maintenance@0.10.10 `
-  -from C:\Users\you\Downloads\maintenance-0.10.10.tar.gz -approve -database sqlite
+.\prusa_connect_windows_amd64.exe module add github.com/singlergold2/maintenance@0.10.19 `
+  -from C:\Users\you\Downloads\maintenance-0.10.19.tar.gz -approve -database sqlite
 ```
 
 Then restart the server. It unpacks the bundle into
@@ -75,8 +78,8 @@ folder the server runs from (the one with `config/` in it):
 
 ```bash
 cd ~/prusa-connect
-./prusa_connect_macos_arm64 module add github.com/singlergold2/maintenance@0.10.10 \
-  -from ~/Downloads/maintenance-0.10.10.tar.gz -approve -database sqlite
+./prusa_connect_macos_arm64 module add github.com/singlergold2/maintenance@0.10.19 \
+  -from ~/Downloads/maintenance-0.10.19.tar.gz -approve -database sqlite
 ```
 
 Then restart the server; it unpacks the bundle into
