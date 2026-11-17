@@ -27,9 +27,9 @@
   "maintenance.page.daysUnit": "Days",
   "maintenance.page.days": "Days",
   "maintenance.page.addButton": "Add",
-  "maintenance.page.printerSays": "The printer shows",
-  "maintenance.page.serverTracked": "the server tracked",
+  "maintenance.page.printerSays": "Printer counter",
+  "maintenance.page.serverTracked": "of which this server saw",
   "maintenance.page.printerHours": "Printer hours",
   "maintenance.page.printerHoursPlaceholder": "14d 7h or 343",
-  "maintenance.page.printerHoursHint": "Type what the printer's own display shows, such as 14d 7h. The tasks keep counting from what the server saw."
+  "maintenance.page.printerHoursHint": "Type what the printer's own display shows, such as 14d 7h. The printer's counter is the whole, the server's count is the part it saw."
 }
