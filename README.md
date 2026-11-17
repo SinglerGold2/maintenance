@@ -70,6 +70,20 @@ Then restart the server. It unpacks the bundle into
 The `.exe` files in a release are the module's own program, which the server
 starts as a child process, not installers.
 
+On macOS the marketplace is the easy way too. By hand, open Terminal in the
+folder the server runs from (the one with `config/` in it):
+
+```bash
+cd ~/prusa-connect
+./prusa_connect_macos_arm64 module add github.com/singlergold2/maintenance@0.10.10 \
+  -from ~/Downloads/maintenance-0.10.10.tar.gz -approve -database sqlite
+```
+
+Then restart the server; it unpacks the bundle into
+`config/config.d/modules/maintenance/bin`. If macOS refuses a binary you
+downloaded, clear the quarantine flag once with
+`xattr -d com.apple.quarantine <file>`.
+
 A release carries one program per platform, named after it:
 
 | File | Runs on |
