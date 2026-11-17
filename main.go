@@ -761,26 +761,36 @@ func (m *module) attributeTools(ctx context.Context, st *store, deviceID, princi
 // its counter. A file this module cannot read is marked seen all the same, so
 // the same broken file is not opened on every load.
 func (m *module) splitJob(ctx context.Context, st *store, files *storageapi.Client, deviceID string, job deviceapi.Job) error {
-	file, err := files.Open(ctx, storageapi.Target{Storage: "local", Path: job.Path})
-	if err != nil && errors.Is(err, storageapi.ErrNoFile) {
-		// The print is gone from the storage. Nothing to read, now or later.
-		_ = st.MarkJobSeen(ctx, deviceID, job.ID)
+	base := path.Base(job.Path)
+	candidates := []string{job.Path}
+	for _, candidate := range []string{strings.TrimPrefix(job.Path, "/"), base, "usb/" + base} {
+		if candidate != "" && candidate != job.Path {
+			candidates = append(candidates, candidate)
+		}
+	}
 
-		return nil
+	var (
+		file *storageapi.File
+		err  error
+	)
+
+	for _, candidate := range candidates {
+		file, err = files.Open(ctx, storageapi.Target{Storage: "local", Path: candidate})
+		if err == nil {
+			break
+		}
+
+		fmt.Fprintf(os.Stderr, "%s: print %s: %s: %v\n", name, job.ID, candidate, err)
 	}
 
 	if err != nil {
-		// The printer's own path carries its folder ("usb/…"), the server's
-		// storage keeps the file under its name alone. Try that before giving up.
-		base := path.Base(job.Path)
-		if base == job.Path {
-			return err
+		if errors.Is(err, storageapi.ErrNoFile) {
+			_ = st.MarkJobSeen(ctx, deviceID, job.ID)
+
+			return nil
 		}
 
-		file, err = files.Open(ctx, storageapi.Target{Storage: "local", Path: base})
-		if err != nil {
-			return err
-		}
+		return err
 	}
 
 	if file.Size() > maxToolFile {
