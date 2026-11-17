@@ -162,8 +162,18 @@
         <p class="text-neutral-600 text-sm">{t('maintenance.tab.toolsHint')}</p>
         <ul class="mt-1 flex flex-wrap gap-3 text-sm">
           {#each device.tools as tool (tool.tool)}
-            <li class="rounded border-neutral-200 border px-2 py-1">
-              T{tool.tool}: <strong>{hours(tool.hours)}</strong>
+            <li
+              class="border-neutral-200 rounded flex items-center gap-2 border px-2 py-1"
+            >
+              <span>T{tool.tool}: <strong>{hours(tool.hours)}</strong></span>
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={busy}
+                onclick={() => (pendingToolReset = tool.tool)}
+              >
+                {t('maintenance.page.reset')}
+              </Button>
             </li>
           {/each}
         </ul>

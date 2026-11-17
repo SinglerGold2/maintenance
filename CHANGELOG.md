@@ -18,6 +18,13 @@ first. `version:` in `module.yaml` is the newest heading below.
   0.10.0 named it 24:00:00, and the database refused it, so the module did not
   start.
 
+## 0.10.8 - 2026-11-17
+
+### Fixed
+
+- The reset button is on the tool line itself. 0.10.7 built the dialog but the
+  line carried no button.
+
 ## 0.10.7 - 2026-11-17
 
 ### Added
