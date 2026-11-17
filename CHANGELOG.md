@@ -3,6 +3,14 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.4.3 - 2026-11-17
+
+### Fixed
+
+- The distance stored by 0.4.2 counted the hours the server had already seen
+  twice. It is rebuilt from the count the operator typed in and the hours the
+  server has tracked, once.
+
 ## 0.4.2 - 2026-11-17
 
 ### Fixed

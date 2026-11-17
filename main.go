@@ -286,7 +286,7 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		offset, known, hoursErr := st.PrinterOffset(r.Context(), device.ID)
+		printerTotal, offset, known, hoursErr := st.PrinterCounts(r.Context(), device.ID)
 		if hoursErr != nil {
 			refuse(w, r, StoreFailed.New("the printer's own hours could not be read").With(faultString("reason", hoursErr.Error())))
 			return
@@ -294,6 +294,14 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 
 		var typed *float64
 		if known {
+			if offset < 0 {
+				offset = printerTotal - hours
+				if offsetErr := st.SetPrinterOffset(r.Context(), device.ID, offset); offsetErr != nil {
+					refuse(w, r, StoreFailed.New("the printer's lead could not be written").With(faultString("reason", offsetErr.Error())))
+					return
+				}
+			}
+
 			// The printer keeps the lead it had when the operator typed its
 			// value in, so both counters move with every print.
 			projected := hours + offset

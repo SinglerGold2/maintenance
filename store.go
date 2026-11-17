@@ -93,23 +93,34 @@ func (s *store) Delete(ctx context.Context, id string) error {
 	return err
 }
 
-// PrinterOffset is how far the machine's own counter is ahead of the hours this
-// server has seen. The second answer says whether the operator ever typed the
-// printer's value in.
-func (s *store) PrinterOffset(ctx context.Context, deviceID string) (float64, bool, error) {
-	query := fmt.Sprintf(`SELECT offset_hours FROM maintenance_printer_hours WHERE device_id = %s`, s.place(1))
+// PrinterCounts is the count the operator read off the machine and the distance
+// this module keeps between that count and the hours it has tracked. A negative
+// distance marks a row written before the distance was kept: the module rebuilds
+// it from the count and the hours it has tracked.
+func (s *store) PrinterCounts(ctx context.Context, deviceID string) (float64, float64, bool, error) {
+	query := fmt.Sprintf(`SELECT total_hours, offset_hours FROM maintenance_printer_hours WHERE device_id = %s`, s.place(1))
 
-	var offset float64
-	err := s.db.QueryRowContext(ctx, query, deviceID).Scan(&offset)
+	var total, offset float64
+	err := s.db.QueryRowContext(ctx, query, deviceID).Scan(&total, &offset)
 	if err == sql.ErrNoRows {
-		return 0, false, nil
+		return 0, 0, false, nil
 	}
 
 	if err != nil {
-		return 0, false, err
+		return 0, 0, false, err
 	}
 
-	return offset, true, nil
+	return total, offset, true, nil
+}
+
+// SetPrinterOffset rewrites the distance alone, keeping the count.
+func (s *store) SetPrinterOffset(ctx context.Context, deviceID string, offset float64) error {
+	query := fmt.Sprintf(`UPDATE maintenance_printer_hours SET offset_hours = %s, updated_at = %s WHERE device_id = %s`,
+		s.place(1), s.place(2), s.place(3))
+
+	_, err := s.db.ExecContext(ctx, query, offset, nowText(), deviceID)
+
+	return err
 }
 
 // SetPrinterHours stores the distance between the value the operator read off
