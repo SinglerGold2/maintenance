@@ -693,7 +693,7 @@ const (
 	// toolFileLimit keeps a page responsive: a few files per load are read, the
 	// rest on the loads after it.
 	toolFileLimit = 3
-	maxToolFile   = 64 << 20
+	maxToolFile   = 512 << 20
 )
 
 // attributeTools splits the length of the finished prints this module has not
@@ -780,8 +780,6 @@ func (m *module) splitJob(ctx context.Context, st *store, files *storageapi.Clie
 	}
 
 	if file.Size() > maxToolFile {
-		_ = st.MarkJobSeen(ctx, deviceID, job.ID)
-
 		return fmt.Errorf("the file is %d bytes, larger than the %d this module reads", file.Size(), maxToolFile)
 	}
 
