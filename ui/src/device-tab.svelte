@@ -48,15 +48,17 @@
   }
 
   function hours(value: number): string {
-    if (value > 0 && value < 1 / 60) {
-      return String(Math.round(value * 3600)) + ' s';
-    }
+    const total = Math.round(value * 3600);
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    const parts: string[] = [];
 
-    if (value > 0 && value < 1) {
-      return String(Math.round(value * 60 * 10) / 10) + ' min';
-    }
+    if (h > 0) parts.push(String(h) + 'h');
+    if (m > 0) parts.push(String(m) + 'm');
+    if (s > 0 || parts.length === 0) parts.push(String(s) + 's');
 
-    return String(Math.round(value * 10) / 10) + ' h';
+    return parts.join(' ');
   }
 
   function intervalText(task: TaskView): string {
