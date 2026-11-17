@@ -82,6 +82,7 @@ export interface components {
             interval_days?: number;
             last_done_hours?: number;
             last_done_at?: string;
+            material?: string;
         };
         TaskView: {
             id: string;
@@ -96,6 +97,7 @@ export interface components {
             remaining: number;
             percent: number;
             status: string;
+            material?: string;
         };
         Device: {
             id: string;

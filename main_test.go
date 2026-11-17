@@ -18,7 +18,7 @@ func TestDefaultsForCoreOneHoldsThePrusaSchedule(t *testing.T) {
 	want := map[string]float64{
 		"Check axes, belts, fans and extruder": 200,
 		"Inspect the electrical connectors":    600,
-		"Check the nozzle, replace when worn":  250,
+		"Check the nozzle, replace when worn":  5000,
 	}
 	for _, task := range tasks {
 		if task.Kind != "hours" {

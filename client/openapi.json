@@ -31,6 +31,9 @@
           },
           "last_done_at": {
             "type": "string"
+          },
+          "material": {
+            "type": "string"
           }
         },
         "required": [
@@ -76,6 +79,9 @@
             "type": "number"
           },
           "status": {
+            "type": "string"
+          },
+          "material": {
             "type": "string"
           }
         },

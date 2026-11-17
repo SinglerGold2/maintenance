@@ -25,7 +25,7 @@ func (s *store) place(n int) string {
 
 func (s *store) Tasks(ctx context.Context, deviceID string) ([]Task, error) {
 	query := fmt.Sprintf(`SELECT id, device_id, name, kind, interval_hours, interval_days,
-        last_done_hours, COALESCE(last_done_at, '')
+        last_done_hours, COALESCE(last_done_at, ''), material
         FROM maintenance_tasks WHERE device_id = %s ORDER BY created_at, name`, s.place(1))
 
 	rows, err := s.db.QueryContext(ctx, query, deviceID)
@@ -39,7 +39,7 @@ func (s *store) Tasks(ctx context.Context, deviceID string) ([]Task, error) {
 	for rows.Next() {
 		var task Task
 		if err := rows.Scan(&task.ID, &task.DeviceID, &task.Name, &task.Kind,
-			&task.IntervalHours, &task.IntervalDays, &task.LastDoneHours, &task.LastDoneAt); err != nil {
+			&task.IntervalHours, &task.IntervalDays, &task.LastDoneHours, &task.LastDoneAt, &task.Material); err != nil {
 			return nil, err
 		}
 
@@ -51,11 +51,11 @@ func (s *store) Tasks(ctx context.Context, deviceID string) ([]Task, error) {
 
 func (s *store) Task(ctx context.Context, id string) (Task, error) {
 	query := fmt.Sprintf(`SELECT id, device_id, name, kind, interval_hours, interval_days,
-        last_done_hours, COALESCE(last_done_at, '') FROM maintenance_tasks WHERE id = %s`, s.place(1))
+        last_done_hours, COALESCE(last_done_at, ''), material FROM maintenance_tasks WHERE id = %s`, s.place(1))
 
 	var task Task
 	err := s.db.QueryRowContext(ctx, query, id).Scan(&task.ID, &task.DeviceID, &task.Name,
-		&task.Kind, &task.IntervalHours, &task.IntervalDays, &task.LastDoneHours, &task.LastDoneAt)
+		&task.Kind, &task.IntervalHours, &task.IntervalDays, &task.LastDoneHours, &task.LastDoneAt, &task.Material)
 
 	return task, err
 }
@@ -72,15 +72,16 @@ func (s *store) Insert(ctx context.Context, tasks []Task) error {
 
 func (s *store) Upsert(ctx context.Context, task Task) error {
 	query := fmt.Sprintf(`INSERT INTO maintenance_tasks
-        (id, device_id, name, kind, interval_hours, interval_days, last_done_hours, last_done_at, created_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        (id, device_id, name, kind, interval_hours, interval_days, last_done_hours, last_done_at, material, created_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, kind = EXCLUDED.kind,
         interval_hours = EXCLUDED.interval_hours, interval_days = EXCLUDED.interval_days,
-        last_done_hours = EXCLUDED.last_done_hours, last_done_at = EXCLUDED.last_done_at`,
-		s.place(1), s.place(2), s.place(3), s.place(4), s.place(5), s.place(6), s.place(7), s.place(8), s.place(9))
+        last_done_hours = EXCLUDED.last_done_hours, last_done_at = EXCLUDED.last_done_at,
+        material = EXCLUDED.material`,
+		s.place(1), s.place(2), s.place(3), s.place(4), s.place(5), s.place(6), s.place(7), s.place(8), s.place(9), s.place(10))
 
 	_, err := s.db.ExecContext(ctx, query, task.ID, task.DeviceID, task.Name, task.Kind,
-		task.IntervalHours, task.IntervalDays, task.LastDoneHours, nullable(task.LastDoneAt), nowText())
+		task.IntervalHours, task.IntervalDays, task.LastDoneHours, nullable(task.LastDoneAt), task.Material, nowText())
 
 	return err
 }

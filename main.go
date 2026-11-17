@@ -85,6 +85,7 @@ type Task struct {
 	IntervalDays  int     `json:"interval_days"`
 	LastDoneHours float64 `json:"last_done_hours"`
 	LastDoneAt    string  `json:"last_done_at,omitempty"`
+	Material      string  `json:"material,omitempty"`
 }
 
 // TaskView is a task with what the counters say about it.
@@ -290,8 +291,10 @@ type saveRequest struct {
 	DeviceID      string  `json:"device_id"`
 	Name          string  `json:"name"`
 	Kind          string  `json:"kind"`
-	IntervalHours float64 `json:"interval_hours"`
-	IntervalDays  int     `json:"interval_days"`
+	IntervalHours float64  `json:"interval_hours"`
+	IntervalDays  int      `json:"interval_days"`
+	Material      string   `json:"material"`
+	LastDoneHours *float64 `json:"last_done_hours"`
 }
 
 func handleSaveTask(w http.ResponseWriter, r *http.Request) {
@@ -329,6 +332,11 @@ func handleSaveTask(w http.ResponseWriter, r *http.Request) {
 		Kind:          sent.Kind,
 		IntervalHours: sent.IntervalHours,
 		IntervalDays:  sent.IntervalDays,
+		Material:      strings.ToLower(strings.TrimSpace(sent.Material)),
+	}
+
+	if sent.LastDoneHours != nil {
+		task.LastDoneHours = *sent.LastDoneHours
 	}
 
 	if task.ID == "" {
@@ -571,7 +579,7 @@ func defaultsFor(model string, now time.Time) []Task {
 		{ID: newID(), Name: "Check axes, belts, fans and extruder", Kind: "hours", IntervalHours: 200, LastDoneAt: stamp},
 		{ID: newID(), Name: "Inspect the electrical connectors", Kind: "hours", IntervalHours: 600, LastDoneAt: stamp},
 		{ID: newID(), Name: "Lubricate the linear rail", Kind: "days", IntervalDays: 90, LastDoneAt: stamp},
-		{ID: newID(), Name: "Check the nozzle, replace when worn", Kind: "hours", IntervalHours: 250, LastDoneAt: stamp},
+		{ID: newID(), Name: "Check the nozzle, replace when worn", Kind: "hours", IntervalHours: 5000, LastDoneAt: stamp, Material: "hardened steel"},
 	}
 }
 
