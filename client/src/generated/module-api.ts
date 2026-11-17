@@ -24,6 +24,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/modules/com.github.aux.singlergold2.maintenance/devices/set": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Point a printer at a schedule
+         * @description Point a printer at a schedule. Its builtin tasks follow that schedule from the next page load on.
+         */
+        put: operations["assign-set"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/modules/com.github.aux.singlergold2.maintenance/devices/tools/reset": {
         parameters: {
             query?: never;
@@ -59,6 +79,98 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The maintenance schedules
+         * @description Every schedule this module knows, with the lines each one runs.
+         */
+        get: operations["list-sets"];
+        put?: never;
+        /**
+         * Write a schedule
+         * @description Write a new schedule, either empty or as a copy of another one.
+         */
+        post: operations["create-set"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Rename or switch a schedule
+         * @description Rename a schedule, point it at another model, or switch it off so no printer may follow it.
+         */
+        put: operations["update-set"];
+        post?: never;
+        /**
+         * Delete a schedule
+         * @description Remove a schedule and its lines. A schedule that ships with this module, or that a printer follows, is refused.
+         */
+        delete: operations["delete-set"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets/{id}/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a line to a schedule
+         * @description Append a line to a schedule. A schedule that ships with this module is refused; copy it and change the copy.
+         */
+        post: operations["add-set-task"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/modules/com.github.aux.singlergold2.maintenance/sets/{id}/tasks/{task}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Change a line of a schedule
+         * @description Change one line of a schedule: its name, its interval or the material it covers.
+         */
+        put: operations["update-set-task"];
+        post?: never;
+        /**
+         * Remove a line from a schedule
+         * @description Remove one line from a schedule.
+         */
+        delete: operations["delete-set-task"];
         options?: never;
         head?: never;
         patch?: never;
@@ -190,6 +302,22 @@ export interface components {
             hours: number;
             reset_hours?: number;
         };
+        SetTask: {
+            id?: string;
+            name: string;
+            kind: string;
+            interval_hours?: number;
+            interval_days?: number;
+            material?: string;
+        };
+        Set: {
+            id: string;
+            name: string;
+            model: string;
+            builtin?: boolean;
+            enabled?: boolean;
+            tasks: components["schemas"]["SetTask"][];
+        };
     };
     responses: never;
     parameters: never;
@@ -226,6 +354,31 @@ export interface operations {
                         hours: number;
                     };
                 };
+            };
+        };
+    };
+    "assign-set": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    device_id: string;
+                    set_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The printer and the schedule it now follows. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -280,6 +433,180 @@ export interface operations {
                         devices: components["schemas"]["Device"][];
                     };
                 };
+            };
+        };
+    };
+    "list-sets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Every schedule with its lines. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "create-set": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    model?: string;
+                    copy_of?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The schedule as it now stands. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "update-set": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    model?: string;
+                    enabled?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Every schedule with its lines. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "delete-set": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "add-set-task": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    kind: string;
+                    interval_hours?: number;
+                    interval_days?: number;
+                    material?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The line as it now stands. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "update-set-task": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                task: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    kind: string;
+                    interval_hours?: number;
+                    interval_days?: number;
+                    material?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The line as it now stands. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "delete-set-task": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                task: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

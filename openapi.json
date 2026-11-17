@@ -311,6 +311,294 @@
           }
         }
       }
+    },
+    "/sets": {
+      "get": {
+        "operationId": "list-sets",
+        "summary": "The maintenance schedules",
+        "responses": {
+          "200": {
+            "description": "Every schedule with its lines."
+          }
+        },
+        "description": "Every schedule this module knows, with the lines each one runs."
+      },
+      "post": {
+        "operationId": "create-set",
+        "summary": "Write a schedule",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "copy_of": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The schedule as it now stands."
+          }
+        },
+        "description": "Write a new schedule, either empty or as a copy of another one."
+      }
+    },
+    "/sets/{id}": {
+      "put": {
+        "operationId": "update-set",
+        "summary": "Rename or switch a schedule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Every schedule with its lines."
+          }
+        },
+        "description": "Rename a schedule, point it at another model, or switch it off so no printer may follow it."
+      },
+      "delete": {
+        "operationId": "delete-set",
+        "summary": "Delete a schedule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          }
+        },
+        "description": "Remove a schedule and its lines. A schedule that ships with this module, or that a printer follows, is refused."
+      }
+    },
+    "/sets/{id}/tasks": {
+      "post": {
+        "operationId": "add-set-task",
+        "summary": "Add a line to a schedule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string"
+                  },
+                  "interval_hours": {
+                    "type": "number"
+                  },
+                  "interval_days": {
+                    "type": "integer"
+                  },
+                  "material": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The line as it now stands."
+          }
+        },
+        "description": "Append a line to a schedule. A schedule that ships with this module is refused; copy it and change the copy."
+      }
+    },
+    "/sets/{id}/tasks/{task}": {
+      "put": {
+        "operationId": "update-set-task",
+        "summary": "Change a line of a schedule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "task",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string"
+                  },
+                  "interval_hours": {
+                    "type": "number"
+                  },
+                  "interval_days": {
+                    "type": "integer"
+                  },
+                  "material": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The line as it now stands."
+          }
+        },
+        "description": "Change one line of a schedule: its name, its interval or the material it covers."
+      },
+      "delete": {
+        "operationId": "delete-set-task",
+        "summary": "Remove a line from a schedule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "task",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          }
+        },
+        "description": "Remove one line from a schedule."
+      }
+    },
+    "/devices/set": {
+      "put": {
+        "operationId": "assign-set",
+        "summary": "Point a printer at a schedule",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "device_id": {
+                    "type": "string"
+                  },
+                  "set_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "device_id",
+                  "set_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The printer and the schedule it now follows."
+          }
+        },
+        "description": "Point a printer at a schedule. Its builtin tasks follow that schedule from the next page load on."
+      }
     }
   },
   "components": {
@@ -508,6 +796,65 @@
         "required": [
           "tool",
           "hours"
+        ]
+      },
+      "SetTask": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "interval_hours": {
+            "type": "number"
+          },
+          "interval_days": {
+            "type": "integer"
+          },
+          "material": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "kind"
+        ]
+      },
+      "Set": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "builtin": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SetTask"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "model",
+          "tasks"
         ]
       }
     }

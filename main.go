@@ -113,9 +113,12 @@ type DeviceView struct {
 	Prints int     `json:"prints"`
 	// PrinterHours is what the machine's own display said, when the operator
 	// typed it in.
-	PrinterHours *float64    `json:"printer_hours,omitempty"`
-	Tools        []ToolHours `json:"tools,omitempty"`
-	Tasks        []TaskView  `json:"tasks"`
+	PrinterHours *float64 `json:"printer_hours,omitempty"`
+	// SetID and SetName are the schedule this printer follows.
+	SetID   string      `json:"set_id,omitempty"`
+	SetName string      `json:"set_name,omitempty"`
+	Tools   []ToolHours `json:"tools,omitempty"`
+	Tasks   []TaskView  `json:"tasks"`
 }
 
 // ToolHours is one tool of a printer and the hours it ran.
@@ -255,6 +258,15 @@ func routes() http.Handler {
 	mux.HandleFunc("POST /tasks/done", handleDone)
 	mux.HandleFunc("DELETE /tasks", handleDelete)
 	mux.HandleFunc("POST /devices/hours", handlePrinterHours)
+	mux.HandleFunc("GET /sets", handleSets)
+	mux.HandleFunc("POST /sets", handleCreateSet)
+	mux.HandleFunc("PUT /sets/{id}", handleUpdateSet)
+	mux.HandleFunc("DELETE /sets/{id}", handleDeleteSet)
+	mux.HandleFunc("POST /sets/{id}/tasks", handleAddSetTask)
+	mux.HandleFunc("PUT /sets/{id}/tasks/{task}", handleUpdateSetTask)
+	mux.HandleFunc("DELETE /sets/{id}/tasks/{task}", handleDeleteSetTask)
+	mux.HandleFunc("PUT /devices/set", handleAssignSet)
+
 	mux.HandleFunc("POST /devices/tools/reset", handleResetTool)
 	mux.HandleFunc("GET /template", handleTemplate)
 	mux.HandleFunc("POST /template", handleSaveTemplate)
@@ -290,30 +302,48 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		setID, setErr := st.PrinterSet(r.Context(), device.ID)
+		if setErr != nil {
+			refuse(w, r, StoreFailed.New("the printer's schedule could not be read").With(faultString("reason", setErr.Error())))
+			return
+		}
+
+		if setID == "" {
+			setID, setErr = st.DefaultSet(r.Context(), device.Model)
+			if setErr != nil {
+				refuse(w, r, StoreFailed.New("the schedule for this model could not be read").With(faultString("reason", setErr.Error())))
+				return
+			}
+
+			if setID != "" {
+				if assignErr := st.AssignPrinterSet(r.Context(), device.ID, setID); assignErr != nil {
+					refuse(w, r, StoreFailed.New("the printer's schedule could not be written").With(faultString("reason", assignErr.Error())))
+					return
+				}
+			}
+		}
+
+		if setID != "" {
+			if syncErr := st.SyncSetTasks(r.Context(), device.ID, setID, time.Now().UTC()); syncErr != nil {
+				refuse(w, r, StoreFailed.New("the printer's tasks could not follow its schedule").With(faultString("reason", syncErr.Error())))
+				return
+			}
+		}
+
 		tasks, taskErr := st.Tasks(r.Context(), device.ID)
 		if taskErr != nil {
 			refuse(w, r, StoreFailed.New("the tasks could not be read").With(faultString("reason", taskErr.Error())))
 			return
 		}
 
-		if len(tasks) == 0 {
-			first, seedErr := st.MarkSeeded(r.Context(), device.ID)
-			if seedErr != nil {
-				refuse(w, r, StoreFailed.New("the seed marker could not be written").With(faultString("reason", seedErr.Error())))
-				return
-			}
-
-			if first {
-				schedule, tplErr := st.Template(r.Context())
-				if tplErr != nil {
-					refuse(w, r, StoreFailed.New("the schedule could not be read").With(faultString("reason", tplErr.Error())))
-					return
-				}
-
-				tasks = tasksFrom(schedule, device.ID, time.Now().UTC())
-				if seedErr = st.Insert(r.Context(), tasks); seedErr != nil {
-					refuse(w, r, StoreFailed.New("the default tasks could not be written").With(faultString("reason", seedErr.Error())))
-					return
+		setName := ""
+		if setID != "" {
+			if sets, listErr := st.Sets(r.Context()); listErr == nil {
+				for _, candidate := range sets {
+					if candidate.ID == setID {
+						setName = candidate.Name
+						break
+					}
 				}
 			}
 		}
@@ -392,6 +422,8 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 			Hours:        hours,
 			Prints:       prints,
 			PrinterHours: typed,
+			SetID:        setID,
+			SetName:      setName,
 			Tools:        tools,
 			Tasks:        deviceTasks,
 		})
@@ -619,6 +651,308 @@ func handleResetTool(w http.ResponseWriter, r *http.Request) {
 	}
 
 	answer(w, http.StatusOK, map[string]any{"device_id": sent.DeviceID, "tool": sent.Tool, "hours": 0})
+}
+
+// handleSets lists every schedule with its lines.
+func handleSets(w http.ResponseWriter, r *http.Request) {
+	st, err := state.store()
+	if err != nil {
+		refuse(w, r, NoDatabase.New("this instance has no database"))
+		return
+	}
+
+	sets, listErr := st.Sets(r.Context())
+	if listErr != nil {
+		refuse(w, r, StoreFailed.New("the schedules could not be read").With(faultString("reason", listErr.Error())))
+		return
+	}
+
+	if sets == nil {
+		sets = []Set{}
+	}
+
+	answer(w, http.StatusOK, map[string]any{"sets": sets})
+}
+
+// setBody is what a schedule is created or renamed with.
+type setBody struct {
+	Name   string `json:"name"`
+	Model  string `json:"model"`
+	CopyOf string `json:"copy_of"`
+}
+
+func (b setBody) clean() (setBody, error) {
+	b.Name = strings.TrimSpace(b.Name)
+	b.Model = strings.ToUpper(strings.TrimSpace(b.Model))
+	if b.Model == "" {
+		b.Model = "*"
+	}
+
+	if b.Name == "" {
+		return b, errors.New("a schedule needs a name")
+	}
+
+	return b, nil
+}
+
+func handleCreateSet(w http.ResponseWriter, r *http.Request) {
+	st, err := state.store()
+	if err != nil {
+		refuse(w, r, NoDatabase.New("this instance has no database"))
+		return
+	}
+
+	var sent setBody
+
+	if decodeErr := json.NewDecoder(r.Body).Decode(&sent); decodeErr != nil {
+		refuse(w, r, InvalidInput.New("the request is not a schedule"))
+		return
+	}
+
+	clean, cleanErr := sent.clean()
+	if cleanErr != nil {
+		refuse(w, r, InvalidInput.New(cleanErr.Error()))
+		return
+	}
+
+	set, createErr := st.CreateSet(r.Context(), clean.Name, clean.Model, clean.CopyOf)
+	if createErr != nil {
+		refuse(w, r, StoreFailed.New("the schedule could not be written").With(faultString("reason", createErr.Error())))
+		return
+	}
+
+	answer(w, http.StatusCreated, set)
+}
+
+func handleUpdateSet(w http.ResponseWriter, r *http.Request) {
+	st, err := state.store()
+	if err != nil {
+		refuse(w, r, NoDatabase.New("this instance has no database"))
+		return
+	}
+
+	var sent struct {
+		Name    string `json:"name"`
+		Model   string `json:"model"`
+		Enabled *bool  `json:"enabled"`
+	}
+
+	if decodeErr := json.NewDecoder(r.Body).Decode(&sent); decodeErr != nil {
+		refuse(w, r, InvalidInput.New("the request is not a schedule"))
+		return
+	}
+
+	clean, cleanErr := (setBody{Name: sent.Name, Model: sent.Model}).clean()
+	if cleanErr != nil {
+		refuse(w, r, InvalidInput.New(cleanErr.Error()))
+		return
+	}
+
+	enabled := true
+	if sent.Enabled != nil {
+		enabled = *sent.Enabled
+	} else if sets, listErr := st.Sets(r.Context()); listErr == nil {
+		for _, candidate := range sets {
+			if candidate.ID == r.PathValue("id") {
+				enabled = candidate.Enabled
+			}
+		}
+	}
+
+	if updateErr := st.UpdateSet(r.Context(), r.PathValue("id"), clean.Name, clean.Model, enabled); updateErr != nil {
+		refuse(w, r, StoreFailed.New("the schedule could not be written").With(faultString("reason", updateErr.Error())))
+		return
+	}
+
+	handleSets(w, r)
+}
+
+func handleDeleteSet(w http.ResponseWriter, r *http.Request) {
+	st, err := state.store()
+	if err != nil {
+		refuse(w, r, NoDatabase.New("this instance has no database"))
+		return
+	}
+
+	builtin, builtinErr := st.SetIsBuiltin(r.Context(), r.PathValue("id"))
+	if builtinErr != nil {
+		refuse(w, r, BuiltinTask.New("there is no such schedule"))
+		return
+	}
+
+	if builtin {
+		refuse(w, r, BuiltinTask.New("a schedule that ships with this module cannot be deleted").With(faultString("reason", "switch it off instead")))
+		return
+	}
+
+	inUse, countErr := st.SetInUse(r.Context(), r.PathValue("id"))
+	if countErr != nil {
+		refuse(w, r, StoreFailed.New("the schedule's printers could not be counted").With(faultString("reason", countErr.Error())))
+		return
+	}
+
+	if inUse > 0 {
+		refuse(w, r, BuiltinTask.New("a schedule in use cannot be deleted").With(faultString("reason", "move its printers to another schedule first")))
+		return
+	}
+
+	if deleteErr := st.DeleteSet(r.Context(), r.PathValue("id")); deleteErr != nil {
+		refuse(w, r, StoreFailed.New("the schedule could not be deleted").With(faultString("reason", deleteErr.Error())))
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+type setTaskBody struct {
+	Name          string  `json:"name"`
+	Kind          string  `json:"kind"`
+	IntervalHours float64 `json:"interval_hours"`
+	IntervalDays  int     `json:"interval_days"`
+	Material      string  `json:"material"`
+}
+
+func (b setTaskBody) task() (SetTask, error) {
+	task := SetTask{Name: strings.TrimSpace(b.Name), Kind: b.Kind, IntervalHours: b.IntervalHours, IntervalDays: b.IntervalDays, Material: strings.TrimSpace(b.Material)}
+
+	if task.Name == "" {
+		return task, errors.New("a task needs a name")
+	}
+
+	if task.Kind == "" {
+		task.Kind = "hours"
+	}
+
+	switch task.Kind {
+	case "hours":
+		if task.IntervalHours <= 0 {
+			return task, errors.New("a task in hours needs an interval above zero")
+		}
+
+		task.IntervalDays = 0
+	case "days":
+		if task.IntervalDays <= 0 {
+			return task, errors.New("a task in days needs an interval above zero")
+		}
+
+		task.IntervalHours = 0
+	default:
+		return task, errors.New("a task counts hours or days")
+	}
+
+	return task, nil
+}
+
+func handleAddSetTask(w http.ResponseWriter, r *http.Request) {
+	st, err := state.store()
+	if err != nil {
+		refuse(w, r, NoDatabase.New("this instance has no database"))
+		return
+	}
+
+	var sent setTaskBody
+	if decodeErr := json.NewDecoder(r.Body).Decode(&sent); decodeErr != nil {
+		refuse(w, r, InvalidInput.New("the request is not a task"))
+		return
+	}
+
+	task, cleanErr := sent.task()
+	if cleanErr != nil {
+		refuse(w, r, InvalidInput.New(cleanErr.Error()))
+		return
+	}
+
+	if builtin, builtinErr := st.SetIsBuiltin(r.Context(), r.PathValue("id")); builtinErr == nil && builtin {
+		refuse(w, r, BuiltinTask.New("a task cannot be added to a schedule that ships with this module").With(faultString("reason", "copy the schedule and change the copy")))
+		return
+	}
+
+	written, writeErr := st.AddSetTask(r.Context(), r.PathValue("id"), task)
+	if writeErr != nil {
+		refuse(w, r, StoreFailed.New("the task could not be written").With(faultString("reason", writeErr.Error())))
+		return
+	}
+
+	answer(w, http.StatusCreated, written)
+}
+
+func handleUpdateSetTask(w http.ResponseWriter, r *http.Request) {
+	st, err := state.store()
+	if err != nil {
+		refuse(w, r, NoDatabase.New("this instance has no database"))
+		return
+	}
+
+	var sent setTaskBody
+	if decodeErr := json.NewDecoder(r.Body).Decode(&sent); decodeErr != nil {
+		refuse(w, r, InvalidInput.New("the request is not a task"))
+		return
+	}
+
+	task, cleanErr := sent.task()
+	if cleanErr != nil {
+		refuse(w, r, InvalidInput.New(cleanErr.Error()))
+		return
+	}
+
+	task.ID = r.PathValue("task")
+
+	if builtin, builtinErr := st.SetIsBuiltin(r.Context(), r.PathValue("id")); builtinErr == nil && builtin {
+		refuse(w, r, BuiltinTask.New("a schedule that ships with this module cannot be changed").With(faultString("reason", "copy it and change the copy")))
+		return
+	}
+
+	if writeErr := st.UpdateSetTask(r.Context(), r.PathValue("id"), task); writeErr != nil {
+		refuse(w, r, StoreFailed.New("the task could not be written").With(faultString("reason", writeErr.Error())))
+		return
+	}
+
+	answer(w, http.StatusOK, task)
+}
+
+func handleDeleteSetTask(w http.ResponseWriter, r *http.Request) {
+	st, err := state.store()
+	if err != nil {
+		refuse(w, r, NoDatabase.New("this instance has no database"))
+		return
+	}
+
+	if builtin, builtinErr := st.SetIsBuiltin(r.Context(), r.PathValue("id")); builtinErr == nil && builtin {
+		refuse(w, r, BuiltinTask.New("a schedule that ships with this module cannot be changed").With(faultString("reason", "copy it and change the copy")))
+		return
+	}
+
+	if deleteErr := st.DeleteSetTask(r.Context(), r.PathValue("id"), r.PathValue("task")); deleteErr != nil {
+		refuse(w, r, StoreFailed.New("the task could not be deleted").With(faultString("reason", deleteErr.Error())))
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func handleAssignSet(w http.ResponseWriter, r *http.Request) {
+	st, err := state.store()
+	if err != nil {
+		refuse(w, r, NoDatabase.New("this instance has no database"))
+		return
+	}
+
+	var sent struct {
+		DeviceID string `json:"device_id"`
+		SetID    string `json:"set_id"`
+	}
+
+	if decodeErr := json.NewDecoder(r.Body).Decode(&sent); decodeErr != nil || sent.DeviceID == "" || sent.SetID == "" {
+		refuse(w, r, InvalidInput.New("the request names no printer or no schedule"))
+		return
+	}
+
+	if assignErr := st.AssignPrinterSet(r.Context(), sent.DeviceID, sent.SetID); assignErr != nil {
+		refuse(w, r, StoreFailed.New("the schedule could not be assigned").With(faultString("reason", assignErr.Error())))
+		return
+	}
+
+	answer(w, http.StatusOK, map[string]string{"device_id": sent.DeviceID, "set_id": sent.SetID})
 }
 
 func handlePrinterHours(w http.ResponseWriter, r *http.Request) {
