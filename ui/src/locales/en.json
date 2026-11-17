@@ -34,5 +34,8 @@
   "maintenance.page.printerHoursHint": "Type what the printer's own display shows, such as 14d 7h. The printer's counter is the whole, the server's count is the part it saw.",
   "maintenance.page.confirmDoneTitle": "Did you really do this maintenance?",
   "maintenance.page.confirmDoneBody": "The counter starts again at the printer's current hours. Only press yes once the work is done.",
-  "maintenance.page.confirmDoneYes": "Yes, it is done"
+  "maintenance.page.confirmDoneYes": "Yes, it is done",
+  "maintenance.cards.due.heading": "Maintenance due",
+  "maintenance.cards.due.none": "Nothing is due. Every task is inside its interval.",
+  "maintenance.cards.due.loading": "Reading the fleet\u2026"
 }
