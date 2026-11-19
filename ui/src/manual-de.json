@@ -34,5 +34,12 @@
   "checkTitle": "Wenn etwas nicht stimmt",
   "check1": "Kein Zähler steigt: läuft der Drucker im Modul als derselbe, den der Server kennt? Ein neu eingerichteter Drucker beginnt bei null.",
   "check2": "Werkzeugstunden fehlen: der G-code muss als fertiger Druck im Speicher des Servers liegen, und das Modul braucht read_storage.",
-  "check3": "Alles grün, obwohl gedruckt wurde: Display-Wert und Server-Zähler auseinander? Trage den Display-Wert neu ein."
+  "check3": "Alles grün, obwohl gedruckt wurde: Display-Wert und Server-Zähler auseinander? Trage den Display-Wert neu ein.",
+  "captionTab": "Der Maintenance-Tab eines Druckers: der Zähler, die Stunden, die dieser Server gesehen hat, die Werkzeugstunden und jede Aufgabe mit ihrem Zustand.",
+  "captionSchedules": "Die Seite Maintenance hält die Pläne. Ein mitgelieferter lässt sich abschalten oder duplizieren, nie bearbeiten.",
+  "captionSchedulePicker": "Das Feld Schedule am Drucker wählt den Plan, dem er folgt. Seine eigenen Stunden und Häkchen bleiben.",
+  "captionTasks": "Aufgaben eines mitgelieferten Plans, mit dem Düsenmaterial je Zeile und dem Intervall, das daraus folgt.",
+  "captionGallery": "Karte aus der Galerie hinzufügen: es gibt eine Maintenance-Karte, ihre Einstellungen entscheiden, was sie zeigt.",
+  "captionSettings": "Die Einstellung der Karte: alle Drucker oder einer aus der Flotte. So entsteht auch eine Karte pro Drucker.",
+  "captionDashboard": "Zwei Karten auf einem Dashboard, eine für die Flotte und eine für einen einzelnen Drucker."
 }

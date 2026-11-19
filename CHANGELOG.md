@@ -10,7 +10,9 @@ first. `version:` in `module.yaml` is the newest heading below.
 - A manual page beside the module: what it counts, how a printer picks its set,
   the nozzle lives, the tool hours, what each colour means, and what to check
   when a figure looks wrong. It carries English and German, independent of the
-  interface language.
+  interface language, and shows seven screenshots with captions: the printer
+  tab, the schedules, a schedule open with its nozzle materials, the card
+  gallery, its setting and two cards on a dashboard.
 - One dashboard card, Maintenance, with a setting: all printers, or one picked
   from the fleet. Put one card per printer on the dashboard and name each in its
   title, or leave the setting at all printers for the fleet view. The card keeps

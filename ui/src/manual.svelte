@@ -12,6 +12,13 @@
     TableRow,
   } from '@prusa/connect-ui/primitives';
 
+  import cardGallery from './assets/cards-gallery.webp';
+  import cardSettings from './assets/card-settings.webp';
+  import dashboard from './assets/dashboard.webp';
+  import printerSchedule from './assets/printer-schedule.webp';
+  import printerTab from './assets/printer-tab.webp';
+  import scheduleTasks from './assets/schedule-tasks.webp';
+  import schedules from './assets/schedules.webp';
   import german from './manual-de.json';
   import { heldHost } from './host';
 
@@ -78,6 +85,18 @@
           <li>{m('countersStep3')}</li>
         </ol>
 
+        <figure class="mt-2">
+          <img
+            src={printerTab}
+            alt={m('captionTab')}
+            class="w-full rounded-sm border border-border"
+            loading="lazy"
+          />
+          <figcaption class="text-neutral-500 mt-1 text-xs">
+            {m('captionTab')}
+          </figcaption>
+        </figure>
+
         <h3 class="mt-2 font-medium">{m('setsTitle')}</h3>
         <p>{m('sets')}</p>
         <ul class="ml-4 list-disc">
@@ -86,6 +105,18 @@
           <li>{m('setsAssign')}</li>
           <li>{m('setsOff')}</li>
         </ul>
+
+        <figure class="mt-2">
+          <img
+            src={schedules}
+            alt={m('captionSchedules')}
+            class="w-full rounded-sm border border-border"
+            loading="lazy"
+          />
+          <figcaption class="text-neutral-500 mt-1 text-xs">
+            {m('captionSchedules')}
+          </figcaption>
+        </figure>
 
         <h3 class="mt-2 font-medium">{m('intervalsTitle')}</h3>
         <p>{m('intervals')}</p>
@@ -110,6 +141,30 @@
         </Table>
         <p class="text-neutral-500">{t('maintenance.page.abrasiveHint')}</p>
 
+        <figure class="mt-2">
+          <img
+            src={scheduleTasks}
+            alt={m('captionTasks')}
+            class="w-full rounded-sm border border-border"
+            loading="lazy"
+          />
+          <figcaption class="text-neutral-500 mt-1 text-xs">
+            {m('captionTasks')}
+          </figcaption>
+        </figure>
+
+        <figure class="mt-2">
+          <img
+            src={printerSchedule}
+            alt={m('captionSchedulePicker')}
+            class="w-full rounded-sm border border-border"
+            loading="lazy"
+          />
+          <figcaption class="text-neutral-500 mt-1 text-xs">
+            {m('captionSchedulePicker')}
+          </figcaption>
+        </figure>
+
         <h3 class="mt-2 font-medium">{m('toolsTitle')}</h3>
         <p>{m('tools')}</p>
 
@@ -123,6 +178,42 @@
 
         <h3 class="mt-2 font-medium">{m('cardTitle')}</h3>
         <p>{m('card')}</p>
+
+        <figure class="mt-2">
+          <img
+            src={cardGallery}
+            alt={m('captionGallery')}
+            class="w-full rounded-sm border border-border"
+            loading="lazy"
+          />
+          <figcaption class="text-neutral-500 mt-1 text-xs">
+            {m('captionGallery')}
+          </figcaption>
+        </figure>
+
+        <figure class="mt-2">
+          <img
+            src={cardSettings}
+            alt={m('captionSettings')}
+            class="w-full rounded-sm border border-border"
+            loading="lazy"
+          />
+          <figcaption class="text-neutral-500 mt-1 text-xs">
+            {m('captionSettings')}
+          </figcaption>
+        </figure>
+
+        <figure class="mt-2">
+          <img
+            src={dashboard}
+            alt={m('captionDashboard')}
+            class="w-full rounded-sm border border-border"
+            loading="lazy"
+          />
+          <figcaption class="text-neutral-500 mt-1 text-xs">
+            {m('captionDashboard')}
+          </figcaption>
+        </figure>
 
         <h3 class="mt-2 font-medium">{m('whereTitle')}</h3>
         <p>{m('where')}</p>

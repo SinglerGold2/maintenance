@@ -116,5 +116,12 @@
   "maintenance.cards.maintenance.set": "Schedule",
   "maintenance.cards.maintenance.hours": "Printed",
   "maintenance.card.all": "All printers",
-  "maintenance.card.printer": "Printer"
+  "maintenance.card.printer": "Printer",
+  "maintenance.manual.captionTab": "The Maintenance tab of a printer: the counter, the hours this server saw, the tool hours and every task with its state.",
+  "maintenance.manual.captionSchedules": "The Maintenance page holds the schedules. A shipped one can be switched off or duplicated, never edited.",
+  "maintenance.manual.captionSchedulePicker": "The Schedule field on a printer picks the plan it follows. Its own hours and Done marks stay.",
+  "maintenance.manual.captionTasks": "Tasks of a shipped schedule, with the nozzle material chosen per line and the interval it brings.",
+  "maintenance.manual.captionGallery": "Add a card from the gallery: one Maintenance card exists, and its settings decide what it shows.",
+  "maintenance.manual.captionSettings": "The card's setting: all printers, or one from the fleet. One card per printer works this way too.",
+  "maintenance.manual.captionDashboard": "Two cards on one dashboard, one for the fleet and one for a single printer."
 }
