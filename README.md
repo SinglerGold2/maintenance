@@ -141,6 +141,13 @@ system language when one matches. File names follow the language tag, which is
 what the browser reports: `cs.json` for Czech, not `cz.json`, which is the
 country.
 
+The setting takes `system`, `en`, `de` or `cs`; Czech is `cs`, and a country code
+is accepted as a convenience. Anything this build does not ship is not an error:
+the page falls back to the browser's language, and from there to English. A
+French operator with `system` therefore reads English until someone adds
+`fr.json`, and the test that compares the files with the offered list says so
+before a release.
+
 ## Development
 
 ```bash

@@ -25,7 +25,7 @@ options:
   - key: language
     type: string
     default: "system"
-    summary: The language of the module's pages. system follows the browser; en, de and cs pin one. A country code such as cz or de-DE works too.
+    summary: The language of the module's pages: system follows the browser, or write en, de or cs. Czech is cs, not cz. A language this package does not ship falls back to the browser's, and then to English.
   - key: alert_percent
     type: int
     default: "90"

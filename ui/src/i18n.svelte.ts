@@ -32,7 +32,11 @@ export function applyLanguage(setting: string | undefined): void {
     return;
   }
 
-  current = (tags as string[]).includes(setting) ? (setting as Tag) : 'en';
+  // A tag this build does not ship falls away like "system" would: the browser
+  // decides, and English is the last word.
+  current = (tags as string[]).includes(setting)
+    ? (setting as Tag)
+    : systemTag();
 }
 
 /** The tag in use, for a page that carries its own prose per language. */
