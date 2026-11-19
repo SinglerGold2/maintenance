@@ -3,6 +3,13 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.14.1 - 2026-11-19
+
+### Fixed
+
+- The German manual is written with its umlauts. The first draft spelled them as
+  ae, oe and ue, which reads like a telegram.
+
 ## 0.14.0 - 2026-11-19
 
 ### Added
