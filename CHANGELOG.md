@@ -19,7 +19,8 @@ Prettier, more capable, and it speaks German and Czech.
 - A language setting on the extension's Settings page, next to `alert_percent`:
   `system` follows the browser, `en`, `de` and `cs` pin one. It applies to the
   page, the printer tab, the cards and the manual, and takes effect when the
-  module restarts.
+  module restarts. A country code such as `cz` or a name such as `Deutsch` is
+  accepted and turned into the tag the build ships.
 - The module speaks German and Czech. Every text sits in `locales/<tag>.json`,
   the manual in `manual/<tag>.json`, and the interface follows the language the
   browser asks for. The manual opens in the system language when it has a file

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -66,5 +68,40 @@ func TestTheViewMarksATaskDueSoonAtTheAlertShare(t *testing.T) {
 	views = subject.view(tasks, 120, now)
 	if views[0].Status != "due" {
 		t.Errorf("120 of 100 reads %q, want due", views[0].Status)
+	}
+}
+
+// TestTheLanguageListMatchesTheFiles keeps the offered languages and the files
+// that back them in step. A language added to ui/src/locales without a line here
+// would be unreadable from the settings page, and a tag listed without a file
+// would be a promise the build cannot keep.
+func TestTheLanguageListMatchesTheFiles(t *testing.T) {
+	t.Parallel()
+
+	files, err := filepath.Glob("ui/src/locales/*.json")
+	if err != nil {
+		t.Fatalf("list the locale files: %v", err)
+	}
+
+	shipped := make(map[string]bool, len(files))
+
+	for _, file := range files {
+		shipped[strings.TrimSuffix(filepath.Base(file), ".json")] = true
+	}
+
+	for _, tag := range languages {
+		if tag == defaultLanguage {
+			continue
+		}
+
+		if !shipped[tag] {
+			t.Errorf("the settings offer %q, but ui/src/locales/%s.json is not there", tag, tag)
+		}
+
+		delete(shipped, tag)
+	}
+
+	for tag := range shipped {
+		t.Errorf("ui/src/locales/%s.json exists, but the settings do not offer it", tag)
 	}
 }
