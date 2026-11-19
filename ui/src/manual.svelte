@@ -19,24 +19,34 @@
   import printerTab from './assets/printer-tab.webp';
   import scheduleTasks from './assets/schedule-tasks.webp';
   import schedules from './assets/schedules.webp';
-  import german from './manual-de.json';
+  import english from './manual/en.json';
+  import german from './manual/de.json';
+  import czech from './manual/cs.json';
   import { heldHost } from './host';
 
   const host = heldHost();
   const t = host.t;
 
-  // The manual is prose, so it carries its own two languages instead of
-  // following the interface language of the whole app.
-  let language = $state<'en' | 'de'>('en');
+  // One file per language under manual/, so a translator copies en.json and
+  // works in their own. The page opens in the system language when a file for
+  // it exists, and in English otherwise.
+  const books = { en: english, de: german, cs: czech } as const;
+  type Tag = keyof typeof books;
+  const tags = Object.keys(books) as Tag[];
 
-  type GermanKey = keyof typeof german;
+  function startTag(): Tag {
+    const spoken = typeof navigator === 'undefined' ? 'en' : navigator.language;
+    const tag = spoken.slice(0, 2).toLowerCase();
+
+    return (tags as string[]).includes(tag) ? (tag as Tag) : 'en';
+  }
+
+  let language = $state<Tag>(startTag());
 
   function m(key: string): string {
-    if (language === 'de' && key in german) {
-      return german[key as GermanKey];
-    }
+    const book = books[language] as Record<string, string>;
 
-    return t('maintenance.manual.' + key);
+    return book[key] ?? (english as Record<string, string>)[key] ?? key;
   }
 
   // The English name stays the one the module and the slicer use; the German
@@ -62,20 +72,13 @@
   <PageHeader title={m('title')} />
 
   <div class="flex items-center gap-2">
-    <Button
-      variant={language === 'en' ? 'secondary' : 'ghost'}
-      size="sm"
-      onclick={() => (language = 'en')}
-    >
-      {t('maintenance.manual.langEn')}
-    </Button>
-    <Button
-      variant={language === 'de' ? 'secondary' : 'ghost'}
-      size="sm"
-      onclick={() => (language = 'de')}
-    >
-      {t('maintenance.manual.langDe')}
-    </Button>
+    {#each tags as tag (tag)}
+      <Button
+        variant={language === tag ? 'secondary' : 'ghost'}
+        size="sm"
+        onclick={() => (language = tag)}>{tag.toUpperCase()}</Button
+      >
+    {/each}
   </div>
 
   <Card>

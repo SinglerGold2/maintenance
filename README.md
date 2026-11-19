@@ -119,6 +119,26 @@ The module asks for the fleet, the print history, `read_storage` for the G-code,
 and a database of its own. The service runs as the Docker container
 `prusa-connect-local` on port 8090.
 
+## Translating
+
+Every text this module draws lives in a JSON file, one per language. The
+interface reads `ui/src/locales/<tag>.json`, the manual reads
+`ui/src/manual/<tag>.json`. English is the source, and anything missing falls
+back to it.
+
+```bash
+cp ui/src/locales/en.json ui/src/locales/fr.json
+cp ui/src/manual/en.json  ui/src/manual/fr.json
+```
+
+Translate the values, leave the keys alone, and send a pull request. The
+manifest needs no change: a file that is there is used, a file that is not is
+not a fault. Two rules keep it reviewable: the keys stay as they are, and the
+English file is never edited into another language.
+
+The manual's language switch offers whatever files exist, and opens in the
+system language when one matches.
+
 ## Development
 
 ```bash

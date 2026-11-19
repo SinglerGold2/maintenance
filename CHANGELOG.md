@@ -14,6 +14,11 @@ first. `version:` in `module.yaml` is the newest heading below.
   tab, the schedules, a schedule open with its nozzle materials, the card
   gallery, its setting and two cards on a dashboard. Section headings are bold,
   and the three states are spelled out in their own colour.
+- The module speaks German and Czech. Every text sits in `locales/<tag>.json`,
+  the manual in `manual/<tag>.json`, and the interface follows the language the
+  browser asks for. The manual opens in the system language when it has a file
+  for it. A language that is not there falls back to English, and the README
+  says how to add one.
 - One dashboard card, Maintenance, with a setting: all printers, or one picked
   from the fleet. Put one card per printer on the dashboard and name each in its
   title, or leave the setting at all printers for the fleet view. The card keeps

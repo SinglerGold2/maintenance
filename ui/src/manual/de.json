@@ -1,7 +1,5 @@
 {
   "title": "Handbuch: Maintenance",
-  "langEn": "EN",
-  "langDe": "DE",
   "whatTitle": "Was dieses Modul tut",
   "what": "Es zählt die Druckstunden jedes Druckers und sagt dir, wann eine Wartung fällig ist. Die Stunden kommen aus der Druckhistorie des Servers; was der Drucker selbst anzeigt, trägst du einmal ein, danach laufen beide Zähler mit jedem Druck weiter.",
   "countersTitle": "Die zwei Zähler",
