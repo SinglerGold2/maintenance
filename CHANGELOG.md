@@ -5,6 +5,8 @@ first. `version:` in `module.yaml` is the newest heading below.
 
 ## 0.14.0 - 2026-11-19
 
+Prettier, more capable, and it speaks German and Czech.
+
 ### Added
 
 - A manual page beside the module: what it counts, how a printer picks its set,
