@@ -3,6 +3,14 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.14.2 - 2026-11-19
+
+### Fixed
+
+- The bundle declares the UI library it is actually built against, 0.1.0 as the
+  minimum. It said 0.0.1, which no build of this module has ever run on; a host
+  that old would have loaded a bundle it cannot draw.
+
 ## 0.14.1 - 2026-11-19
 
 ### Fixed
