@@ -3,6 +3,13 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.14.7 - 2026-11-19
+
+### Changed
+
+- The Tasks button on a set is green and outlined. As a ghost button it read as
+  a label next to Disable and Duplicate, and it is the one that opens the plan.
+
 ## 0.14.6 - 2026-11-19
 
 ### Changed
