@@ -5,7 +5,8 @@ Prettier, more capable, and it speaks German and Czech.
 **A manual page.** What the module counts, how a printer picks its schedule, the
 nozzle lives by material, the tool hours, what each colour means, what to check
 when a figure looks wrong, and where the language setting lives. Seven
-screenshots with captions, in English, German and Czech.
+screenshots with captions, in English, German and Czech, and one of them shows
+the language field itself.
 
 **One card, configured.** The dashboard card takes a printer or leaves it at the
 whole fleet, so a dashboard can carry one card per printer or one for the fleet.
