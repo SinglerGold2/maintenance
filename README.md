@@ -1,5 +1,7 @@
 # Maintenance for Prusa Connect
 
+![Maintenance for Prusa Connect](artwork/card.png)
+
 Counts the print hours of every printer and tells you when a maintenance task is
 due. Live in the marketplace: install it under Settings, Extensions.
 
@@ -128,3 +130,18 @@ make release   # the release directory, in release/
 ## Licence
 
 MIT. See `LICENSE`.
+
+## Artwork
+
+`artwork/card.png` and `artwork/icon.png` combine three icons from SVG Repo:
+
+| Icon | Source | Licence | Author |
+| --- | --- | --- | --- |
+| 3D printer | [3d-printer](https://www.svgrepo.com/svg/19622/3d-printer) | CC0 | SVG Repo |
+| Wrench | [wrench-13](https://www.svgrepo.com/svg/492002/wrench-13) | CC Attribution | [Lugine Hiary](https://www.svgrepo.com/author/Lugine%20Hiary/) |
+| Clock | [clock](https://www.svgrepo.com/svg/434037/clock) | Public Domain | [Sensa](https://www.svgrepo.com/author/Sensa/) |
+
+The wrench requires attribution, so Lugine Hiary is named here and in
+[artwork/CREDITS.md](artwork/CREDITS.md). The banner carries the same credit in
+its corner. The project code stays MIT; the artwork keeps the licences listed
+above.
