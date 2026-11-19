@@ -3,6 +3,8 @@
 import type { ModuleHost } from '@prusa/connect-ui/slots';
 import { bind, type operations } from 'maintenance-client';
 
+import { applyLanguage } from './i18n.svelte';
+
 /** What GET /overview answers, as openapi.json declares it. */
 export type Overview =
   operations['read-overview']['responses'][200]['content']['application/json'];
@@ -15,8 +17,12 @@ export const maintenanceOn = (host: ModuleHost) => {
   const routes = bind(host.client);
 
   return {
-    overview: (signal?: AbortSignal): Promise<Overview> =>
-      routes.readOverview({}, signal),
+    overview: async (signal?: AbortSignal): Promise<Overview> => {
+      const answer = await routes.readOverview({}, signal);
+      applyLanguage(answer.language);
+
+      return answer;
+    },
     saveTask: (
       body: operations['save-task']['requestBody']['content']['application/json'],
       signal?: AbortSignal,

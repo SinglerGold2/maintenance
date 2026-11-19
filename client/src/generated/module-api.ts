@@ -439,6 +439,8 @@ export interface operations {
                     "application/json": {
                         alert_percent: number;
                         devices: components["schemas"]["Device"][];
+                        /** @description The language of the module's own pages: system, en, de or cs. */
+                        language: string;
                     };
                 };
             };

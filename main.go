@@ -58,10 +58,21 @@ var (
 
 const defaultAlertPercent = 90
 
+// defaultLanguage is the setting's value until a person picks one, and it means
+// the language the browser asks for.
+const defaultLanguage = "system"
+
+// languages are the ones a build ships a file for. "system" is the default and
+// means the language the browser asks for.
+var languages = []string{defaultLanguage, "en", "de", "cs"}
+
 // Settings is what an operator writes under this instance's config block.
 type Settings struct {
 	// AlertPercent is the share of an interval at which a task reads as due soon.
 	AlertPercent int `json:"alert_percent"`
+	// Language is the language of the module's own pages, or "system" to follow
+	// the browser. The page can change it too; both read the same value.
+	Language string `json:"language"`
 }
 
 func manifestScalar(document []byte, key string) string {
@@ -136,6 +147,7 @@ type module struct {
 	bus      *busapi.Client
 	storage  *storageapi.Client
 	alert    int
+	language string
 
 	notified map[string]string
 
@@ -204,6 +216,7 @@ func run() error {
 //nolint:gochecknoglobals // the one piece of state this module has.
 var state = &module{
 	alert:    defaultAlertPercent,
+	language: defaultLanguage,
 	cache:    map[string]hoursEntry{},
 	notified: map[string]string{},
 }
@@ -223,6 +236,14 @@ func methods() wirerpc.Methods {
 			if sent.AlertPercent < 1 || sent.AlertPercent > 99 {
 				sent.AlertPercent = defaultAlertPercent
 			}
+
+			if !isLanguage(sent.Language) {
+				sent.Language = defaultLanguage
+			}
+
+			state.mu.Lock()
+			state.language = sent.Language
+			state.mu.Unlock()
 
 			if grants.Database == nil {
 				return errNoDatabase
@@ -429,7 +450,9 @@ func handleOverview(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	answer(w, http.StatusOK, map[string]any{"devices": views, "alert_percent": state.alertPercent()})
+	answer(w, http.StatusOK, map[string]any{
+		"devices": views, "alert_percent": state.alertPercent(), "language": state.languageTag(),
+	})
 }
 
 type saveRequest struct {
@@ -1202,6 +1225,19 @@ func (m *module) store() (*store, error) {
 	return &store{db: m.db, postgres: m.postgres}, nil
 }
 
+// languageTag is the language of the module's own pages as the operator set
+// it, or "system" to follow the browser.
+func (m *module) languageTag() string {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if isLanguage(m.language) {
+		return m.language
+	}
+
+	return defaultLanguage
+}
+
 func (m *module) alertPercent() int {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -1452,3 +1488,14 @@ type stdio struct{}
 func (stdio) Read(p []byte) (int, error)  { return os.Stdin.Read(p) }
 func (stdio) Write(p []byte) (int, error) { return os.Stdout.Write(p) }
 func (stdio) Close() error                { return os.Stdin.Close() }
+
+// isLanguage answers whether a tag is one this build ships, or "system".
+func isLanguage(tag string) bool {
+	for _, known := range languages {
+		if known == tag {
+			return true
+		}
+	}
+
+	return false
+}

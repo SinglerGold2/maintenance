@@ -3,12 +3,12 @@
   import type { CardProps } from '@prusa/connect-ui/slots';
 
   import { heldHost } from '../host';
+  import { t } from '../i18n.svelte';
   import { maintenanceOn, type Overview, type TaskView } from '../maintenance';
 
   let { config, title }: CardProps = $props();
 
   const host = heldHost();
-  const t = host.t;
   const api = maintenanceOn(host);
 
   let overview = $state<Overview | undefined>();

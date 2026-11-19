@@ -22,30 +22,22 @@
   import english from './manual/en.json';
   import german from './manual/de.json';
   import czech from './manual/cs.json';
-  import { heldHost } from './host';
-
-  const host = heldHost();
-  const t = host.t;
+  import { applyLanguage, currentTag, t } from './i18n.svelte';
 
   // One file per language under manual/, so a translator copies en.json and
-  // works in their own. The page opens in the system language when a file for
-  // it exists, and in English otherwise.
+  // works in their own. The page follows the extension's language setting; the
+  // buttons switch it for this visit.
   const books = { en: english, de: german, cs: czech } as const;
   type Tag = keyof typeof books;
   const tags = Object.keys(books) as Tag[];
 
+  // The page follows the extension's language setting. The buttons switch it
+  // for this visit without writing anything.
+  const language = $derived<Tag>(currentTag());
+
   // The file follows the language tag, which is what the browser reports; the
   // button shows the country, which is what a reader recognises.
   const labels: Record<Tag, string> = { en: 'EN', de: 'DE', cs: 'CZ' };
-
-  function startTag(): Tag {
-    const spoken = typeof navigator === 'undefined' ? 'en' : navigator.language;
-    const tag = spoken.slice(0, 2).toLowerCase();
-
-    return (tags as string[]).includes(tag) ? (tag as Tag) : 'en';
-  }
-
-  let language = $state<Tag>(startTag());
 
   function m(key: string): string {
     const book = books[language] as Record<string, string>;
@@ -80,7 +72,8 @@
       <Button
         variant={language === tag ? 'secondary' : 'ghost'}
         size="sm"
-        onclick={() => (language = tag)}>{labels[tag]}</Button
+        onclick={() => applyLanguage(tag)}>{labels[tag]}</Button
+      >
       >
     {/each}
   </div>

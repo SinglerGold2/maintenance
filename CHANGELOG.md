@@ -16,6 +16,10 @@ Prettier, more capable, and it speaks German and Czech.
   tab, the schedules, a schedule open with its nozzle materials, the card
   gallery, its setting and two cards on a dashboard. Section headings are bold,
   and the three states are spelled out in their own colour.
+- A language setting on the extension's Settings page, next to `alert_percent`:
+  `system` follows the browser, `en`, `de` and `cs` pin one. It applies to the
+  page, the printer tab, the cards and the manual, and takes effect when the
+  module restarts.
 - The module speaks German and Czech. Every text sits in `locales/<tag>.json`,
   the manual in `manual/<tag>.json`, and the interface follows the language the
   browser asks for. The manual opens in the system language when it has a file

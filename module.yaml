@@ -22,6 +22,10 @@ require:
   core-storage.fetch: "*"
 
 options:
+  - key: language
+    type: string
+    default: "system"
+    summary: The language of the module's pages, one of system, en, de or cs. system follows the browser.
   - key: alert_percent
     type: int
     default: "90"

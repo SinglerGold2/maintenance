@@ -11,6 +11,7 @@
   } from '@prusa/connect-ui/primitives';
 
   import { heldHost } from './host';
+  import { t } from './i18n.svelte';
   import {
     maintenanceOn,
     type Overview,
@@ -21,7 +22,6 @@
   let { deviceId }: { deviceId: string } = $props();
 
   const host = heldHost();
-  const t = host.t;
   const api = maintenanceOn(host);
 
   let overview = $state<Overview | undefined>();

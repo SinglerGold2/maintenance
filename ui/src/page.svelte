@@ -16,10 +16,10 @@
   } from '@prusa/connect-ui/primitives';
 
   import { heldHost } from './host';
+  import { t } from './i18n.svelte';
   import { maintenanceOn, type Set } from './maintenance';
 
   const host = heldHost();
-  const t = host.t;
   const signal = host.signal;
   const api = maintenanceOn(host);
 

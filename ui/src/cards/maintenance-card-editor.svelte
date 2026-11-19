@@ -10,12 +10,12 @@
   import type { CardEditorProps } from '@prusa/connect-ui/slots';
 
   import { heldHost } from '../host';
+  import { t } from '../i18n.svelte';
   import { maintenanceOn, type Overview } from '../maintenance';
 
   let { config, onchange }: CardEditorProps = $props();
 
   const host = heldHost();
-  const t = host.t;
   const api = maintenanceOn(host);
   const uid = $props.id();
 
