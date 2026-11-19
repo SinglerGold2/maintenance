@@ -17,3 +17,12 @@ artwork is shown. The other two do not require it, and are credited anyway.
 All three images carry the credit line in their corner, which names the icon
 numbers. The wrench is CC Attribution, so add `wrench by Lugine Hiary` to that
 line before uploading, or rely on this file and the README table to carry it.
+
+## Files
+
+```
+marketplace.jpg        2048x2048  master, 215 KB
+marketplace-1024.png   1024x1024  the upload, lossless, 178 KB
+card.png               2741x1530  README banner
+icon.png                512x512   the mark alone
+```
