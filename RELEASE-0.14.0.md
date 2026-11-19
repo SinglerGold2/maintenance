@@ -4,7 +4,7 @@ Prettier, more capable, and it speaks German and Czech.
 
 **A manual page.** What the module counts, how a printer picks its schedule, the
 nozzle lives by material, the tool hours, what each colour means, what to check
-when a figure looks wrong, and where the language setting lives. Seven
+when a figure looks wrong, and where the language setting lives. Eight
 screenshots with captions, in English, German and Czech, and one of them shows
 the language field itself.
 
