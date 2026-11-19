@@ -15,6 +15,7 @@
   import cardGallery from './assets/cards-gallery.webp';
   import cardSettings from './assets/card-settings.webp';
   import dashboard from './assets/dashboard.webp';
+  import languageSetting from './assets/language-setting.webp';
   import printerSchedule from './assets/printer-schedule.webp';
   import printerTab from './assets/printer-tab.webp';
   import scheduleTasks from './assets/schedule-tasks.webp';
@@ -242,6 +243,18 @@
         <h3 class="mt-2 font-semibold">{m('languageTitle')}</h3>
         <p>{m('language')}</p>
         <p class="text-neutral-500">{m('languageRestart')}</p>
+        <figure class="mt-2">
+          <img
+            src={languageSetting}
+            alt={m('captionLanguage')}
+            class="w-full rounded-sm border border-border"
+            loading="lazy"
+          />
+          <figcaption class="text-neutral-500 mt-1 text-xs">
+            {m('captionLanguage')}
+          </figcaption>
+        </figure>
+
         <p class="text-neutral-500">{m('languageContribute')}</p>
         <p>
           <a

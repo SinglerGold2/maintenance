@@ -48,5 +48,6 @@
   "language": "Jazyk rozšíření se nastavuje na serveru, ne zde: Rozšíření, Maintenance, Settings, pole language. Hodnota system znamená jazyk prohlížeče, en, de nebo cs pevně zvolí jeden. Čeština je cs, ne cz, kód země se však přijme.",
   "languageRestart": "Volba se uloží hned a čte se při startu, takže se modul po uložení restartuje. Zvolte klidnou chvíli: import, který právě běží, nebo tisk, jehož G-code se čte, tím restartem skončí. Jazyk, který balíček neobsahuje, se vrátí k jazyku prohlížeče a odtud k angličtině. Tlačítka výše přepnou jazyk pro tuto návštěvu, aniž by cokoli ukládala.",
   "languageContribute": "Chybí vám váš jazyk? Pomozte na GitHubu. Zkopírujte locales/en.json a manual/en.json na <tag>.json, přeložte hodnoty, klíče nechte být a otevřete pull request. Nikdo tady by neměl psát jazyk, kterým nemluví, a strojový překlad se tak i čte. Čeština je přesně to: zkušební balon přeložený strojem. Jestli obstojí, musí posoudit čeští čtenáři.",
-  "languageRepo": "github.com/SinglerGold2/maintenance"
+  "languageRepo": "github.com/SinglerGold2/maintenance",
+  "captionLanguage": "Pole language v nastavení serveru pro toto rozšíření, s hodnotou system a popisem pod ním."
 }

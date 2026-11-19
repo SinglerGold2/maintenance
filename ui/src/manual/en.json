@@ -48,5 +48,6 @@
   "language": "The language of the extension is set on the server, not here: Extensions, Maintenance, Settings, the field language. There, system means the language the browser asks for, and en, de or cs pin one. Czech is cs, not cz, though a country code is accepted as a courtesy.",
   "languageRestart": "The choice is stored at once and read at start-up, so the module restarts when it is saved. Pick a quiet moment: an import halfway through, or a print whose G-code is being read, is cut off by that restart. A language this package does not carry falls back to the browser's, and from there to English. The buttons above switch the language for this visit without saving anything.",
   "languageContribute": "Want your own language? Then help on GitHub. Copy locales/en.json and manual/en.json to <tag>.json, translate the values, keep the keys, open a pull request. Nobody here should write a language they do not speak, and a machine translation reads like one. The Czech is exactly that: a trial balloon, translated by a machine. Whether it holds up is for Czech readers to say.",
-  "languageRepo": "github.com/SinglerGold2/maintenance"
+  "languageRepo": "github.com/SinglerGold2/maintenance",
+  "captionLanguage": "The language field in the server's settings for this extension, with the value system and the description beside it."
 }
