@@ -114,7 +114,7 @@
       </p>
     {/if}
 
-    <ul class="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto text-sm">
+    <ul class="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-2 text-sm">
       {#each rows as row (row.device)}
         <li class="flex flex-col gap-1">
           <div class="flex items-center justify-between gap-2">
