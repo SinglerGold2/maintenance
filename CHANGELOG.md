@@ -3,6 +3,15 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.13.1 - 2026-11-19
+
+### Changed
+
+- The marketplace card says what the module does today: schedules per printer,
+  nozzle life by material, and tool hours read from the G-code.
+- The README opens with the artwork, and its closing section names every source
+  of that artwork, its licence and its author.
+
 ## 0.10.2 - 2026-11-17
 
 ### Fixed

@@ -3,10 +3,10 @@
 
 name: maintenance
 kind: sink
-version: 0.13.0
+version: 0.13.1
 license: MIT
 title: Maintenance
-summary: Counts print hours per printer and reminds you when maintenance is due.
+summary: Print-hour schedules per printer, nozzle life by material and tool hours read from your G-code.
 codeowner: singlergold2
 contract_major: 1
 openapi: openapi.json
