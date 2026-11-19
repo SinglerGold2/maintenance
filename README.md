@@ -148,6 +148,10 @@ French operator with `system` therefore reads English until someone adds
 `fr.json`, and the test that compares the files with the offered list says so
 before a release.
 
+The Czech files are a trial balloon: translated by a machine, offered so the
+mechanism can be seen. Whether they hold up is for Czech readers to say, and a
+pull request that improves them is more welcome than one that adds a language.
+
 ## Development
 
 ```bash
