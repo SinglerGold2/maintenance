@@ -3,6 +3,14 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.14.6 - 2026-11-19
+
+### Changed
+
+- The colour section of the manual describes the card as it is now. It said a
+  green task is not marked, which stopped being true when the card began to show
+  every task; the states now say where a task sits and what it triggers.
+
 ## 0.14.5 - 2026-11-19
 
 ### Changed
