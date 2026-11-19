@@ -96,17 +96,17 @@
           <span class="flex min-w-0 items-center gap-2">
             <span
               class="size-1.5 shrink-0 rounded-full"
-              class:bg-red-500={task.status === 'due'}
-              class:bg-amber-500={task.status === 'soon'}
-              class:bg-emerald-500={task.status === 'ok'}
+              class:bg-state-fault-edge={task.status === 'due'}
+              class:bg-state-attention-edge={task.status === 'soon'}
+              class:bg-state-done-edge={task.status === 'ok'}
             ></span>
             <span class="truncate">{task.name}</span>
           </span>
           <span
             class="shrink-0 tabular-nums"
-            class:text-red-500={task.status === 'due'}
-            class:text-amber-500={task.status === 'soon'}
-            class:text-emerald-500={task.status === 'ok'}
+            class:text-state-fault-text={task.status === 'due'}
+            class:text-state-attention-text={task.status === 'soon'}
+            class:text-state-done-text={task.status === 'ok'}
             >{Math.round(task.percent)}%</span
           >
         </li>

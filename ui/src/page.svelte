@@ -302,7 +302,7 @@
             <Button
               variant="ghost"
               size="sm"
-              class="border-emerald-600/70 text-emerald-500 hover:bg-emerald-600/10 hover:text-emerald-400 border"
+              class="border border-state-done-edge text-state-done-text hover:bg-state-done/10 hover:text-state-done-text"
               onclick={() =>
                 (expanded = expanded === set.id ? undefined : set.id)}
             >

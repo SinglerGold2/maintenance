@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Badge, type BadgeVariant } from '@prusa/connect-ui/primitives';
   import type { CardProps } from '@prusa/connect-ui/slots';
 
   import { heldHost } from '../host';
@@ -27,6 +28,17 @@
 
   const weights: Record<string, number> = { due: 0, soon: 1, ok: 2 };
   const weight = (status: string) => weights[status] ?? 2;
+
+  // The app's own state tints, so a dot reads the same here as on the printer
+  // screen and follows the theme rather than a colour of our own.
+  const badges: Record<string, BadgeVariant> = {
+    due: 'stateFault',
+    soon: 'stateAttention',
+    ok: 'stateDone',
+  };
+
+  const badgeOf = (status: string): BadgeVariant =>
+    badges[status] ?? 'stateDone';
 
   const labelOf = (status: string): string => {
     if (status === 'due') return t('maintenance.page.statusDue');
@@ -73,18 +85,14 @@
             <span class="flex min-w-0 items-center gap-2">
               <span
                 class="size-2 shrink-0 rounded-full"
-                class:bg-red-500={row.worst === 'due'}
-                class:bg-amber-500={row.worst === 'soon'}
-                class:bg-emerald-500={row.worst === 'ok'}
+                class:bg-state-fault-edge={row.worst === 'due'}
+                class:bg-state-attention-edge={row.worst === 'soon'}
+                class:bg-state-done-edge={row.worst === 'ok'}
               ></span>
               <span class="truncate font-medium">{row.device}</span>
             </span>
-            <span
-              class="shrink-0 text-xs"
-              class:text-red-500={row.worst === 'due'}
-              class:text-amber-500={row.worst === 'soon'}
-              class:text-emerald-500={row.worst === 'ok'}
-              >{labelOf(row.worst)}</span
+            <Badge variant={badgeOf(row.worst)} size="sm"
+              >{labelOf(row.worst)}</Badge
             >
           </div>
           <ul class="flex flex-col gap-0.5 pl-4 text-xs">
@@ -93,17 +101,17 @@
                 <span class="flex min-w-0 items-center gap-2">
                   <span
                     class="size-1.5 shrink-0 rounded-full"
-                    class:bg-red-500={task.status === 'due'}
-                    class:bg-amber-500={task.status === 'soon'}
-                    class:bg-emerald-500={task.status === 'ok'}
+                    class:bg-state-fault-edge={task.status === 'due'}
+                    class:bg-state-attention-edge={task.status === 'soon'}
+                    class:bg-state-done-edge={task.status === 'ok'}
                   ></span>
                   <span class="text-neutral-600 truncate">{task.name}</span>
                 </span>
                 <span
                   class="shrink-0 tabular-nums"
-                  class:text-red-500={task.status === 'due'}
-                  class:text-amber-500={task.status === 'soon'}
-                  class:text-emerald-500={task.status === 'ok'}
+                  class:text-state-fault-text={task.status === 'due'}
+                  class:text-state-attention-text={task.status === 'soon'}
+                  class:text-state-done-text={task.status === 'ok'}
                   >{Math.round(task.percent)}%</span
                 >
               </li>

@@ -271,8 +271,8 @@
           <div class="flex items-center gap-2">
             <span
               class="text-sm font-semibold"
-              class:text-red-600={task.status === 'due'}
-              class:text-amber-600={task.status === 'soon'}
+              class:text-state-fault-text={task.status === 'due'}
+              class:text-state-attention-text={task.status === 'soon'}
               class:text-neutral-600={task.status === 'ok'}
             >
               {statusText(task)}

@@ -21,7 +21,9 @@ first. `version:` in `module.yaml` is the newest heading below.
 
 - The due card shows every task with its share of the interval and a coloured
   dot, red first, then yellow, then green. Before, a printer's name was not drawn
-  at all and only the marked tasks appeared.
+  at all and only the marked tasks appeared. Both cards and the printer tab use
+  the app's own state tints, so the colours follow the theme and mean the same
+  as on the Printers screen.
 - The manual states that 14d 7h and 343 h are the same figure, and that tool
   hours are counted to the second: on an INDX print a nozzle may work for forty
   seconds, which a count in whole minutes would hide.
