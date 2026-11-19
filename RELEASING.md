@@ -45,6 +45,7 @@ Everything belongs in `~/harness/maintenance-release/<version>/`:
 <version>/
   maintenance-<version>.tar.gz
   maintenance-<version>-windows-amd64.zip
+  RELEASE-<version>.md      the release notes, the text of the GitHub page
   build/                    the unpacked release directory, as it was built
 ```
 
