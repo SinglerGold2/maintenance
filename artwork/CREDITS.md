@@ -1,6 +1,8 @@
 # Artwork credits
 
-`card.png` and `icon.png` combine three icons from SVG Repo. The project code is
+`card.png`, `icon.png` and `marketplace.jpg` combine three icons from SVG Repo.
+`marketplace.jpg` is the square upload for the marketplace listing only; the
+README shows `card.png`. The project code is
 MIT, the artwork keeps the licences below.
 
 | Icon | Source | Licence | Author |
@@ -11,3 +13,7 @@ MIT, the artwork keeps the licences below.
 
 The wrench is the one that requires attribution: name Lugine Hiary wherever the
 artwork is shown. The other two do not require it, and are credited anyway.
+
+All three images carry the credit line in their corner, which names the icon
+numbers. The wrench is CC Attribution, so add `wrench by Lugine Hiary` to that
+line before uploading, or rely on this file and the README table to carry it.
