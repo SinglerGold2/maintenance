@@ -1,7 +1,7 @@
 # Artwork credits
 
-`card.png`, `icon.png` and `marketplace.jpg` combine three icons from SVG Repo.
-`marketplace.jpg` is the square upload for the marketplace listing only; the
+`card.png`, `icon.png` and `marketplace.png` combine three icons from SVG Repo.
+`marketplace.png` is the square upload for the marketplace listing only; the
 README shows `card.png`. The project code is
 MIT, the artwork keeps the licences below.
 
@@ -21,8 +21,12 @@ line before uploading, or rely on this file and the README table to carry it.
 ## Files
 
 ```
-marketplace.jpg        2048x2048  master, 215 KB
-marketplace-1024.png   1024x1024  the upload, lossless, 178 KB
+marketplace.png        2048x2048  the upload, lossless, 481 KB
+marketplace-1024.png   1024x1024  the same, if a smaller one is wanted, 178 KB
 card.png               2741x1530  README banner
 icon.png                512x512   the mark alone
 ```
+
+The marketplace takes 5 MB, so the 2048 PNG fits with room to spare. JPEG was
+not used: on flat dark areas the text and edges pick up artefacts, while PNG
+stays exact at this size.
