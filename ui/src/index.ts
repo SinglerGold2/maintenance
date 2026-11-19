@@ -7,6 +7,7 @@ import { defineModule } from '@prusa/connect-ui/slots';
 
 import { holdHost } from './host';
 import DueCard from './cards/due-card.svelte';
+import PrinterCard from './cards/printer-card.svelte';
 import DeviceTab from './device-tab.svelte';
 import Manual from './manual.svelte';
 import Page from './page.svelte';
@@ -33,5 +34,6 @@ export default defineModule((host) => {
   host.register.page('maintenance', Page);
   host.register.page('maintenance-manual', Manual);
   host.register.card('due', DueCard);
+  host.register.card('printer', PrinterCard);
   host.register.deviceTab('maintenance', DeviceTab);
 });

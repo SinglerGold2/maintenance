@@ -26,27 +26,13 @@
   }
 
   const weights: Record<string, number> = { due: 0, soon: 1, ok: 2 };
-  const dots: Record<string, string> = {
-    due: 'bg-red-500',
-    soon: 'bg-amber-500',
-    ok: 'bg-emerald-500',
-  };
-  const texts: Record<string, string> = {
-    due: 'text-red-500',
-    soon: 'text-amber-500',
-    ok: 'text-emerald-500',
-  };
-  const labels: Record<string, string> = {
-    due: 'maintenance.page.statusDue',
-    soon: 'maintenance.page.statusSoon',
-    ok: 'maintenance.page.statusOk',
-  };
-
   const weight = (status: string) => weights[status] ?? 2;
-  const dot = (status: string): string => dots[status] ?? 'bg-emerald-500';
-  const text = (status: string): string => texts[status] ?? 'text-emerald-500';
-  const label = (status: string): string =>
-    t(labels[status] ?? 'maintenance.page.statusOk');
+
+  const labelOf = (status: string): string => {
+    if (status === 'due') return t('maintenance.page.statusDue');
+    if (status === 'soon') return t('maintenance.page.statusSoon');
+    return t('maintenance.page.statusOk');
+  };
 
   // Every printer keeps its own block, and every task of it is shown: a green
   // line is the proof that this interval is still fine, not noise to hide.
@@ -85,12 +71,20 @@
         <li class="flex flex-col gap-1">
           <div class="flex items-center justify-between gap-2">
             <span class="flex min-w-0 items-center gap-2">
-              <span class="size-2 shrink-0 rounded-full {dot(row.worst)}"
+              <span
+                class="size-2 shrink-0 rounded-full"
+                class:bg-red-500={row.worst === 'due'}
+                class:bg-amber-500={row.worst === 'soon'}
+                class:bg-emerald-500={row.worst === 'ok'}
               ></span>
               <span class="truncate font-medium">{row.device}</span>
             </span>
-            <span class="shrink-0 text-xs {text(row.worst)}"
-              >{label(row.worst)}</span
+            <span
+              class="shrink-0 text-xs"
+              class:text-red-500={row.worst === 'due'}
+              class:text-amber-500={row.worst === 'soon'}
+              class:text-emerald-500={row.worst === 'ok'}
+              >{labelOf(row.worst)}</span
             >
           </div>
           <ul class="flex flex-col gap-0.5 pl-4 text-xs">
@@ -98,11 +92,18 @@
               <li class="flex items-center justify-between gap-2">
                 <span class="flex min-w-0 items-center gap-2">
                   <span
-                    class="size-1.5 shrink-0 rounded-full {dot(task.status)}"
+                    class="size-1.5 shrink-0 rounded-full"
+                    class:bg-red-500={task.status === 'due'}
+                    class:bg-amber-500={task.status === 'soon'}
+                    class:bg-emerald-500={task.status === 'ok'}
                   ></span>
                   <span class="text-neutral-600 truncate">{task.name}</span>
                 </span>
-                <span class="shrink-0 tabular-nums {text(task.status)}"
+                <span
+                  class="shrink-0 tabular-nums"
+                  class:text-red-500={task.status === 'due'}
+                  class:text-amber-500={task.status === 'soon'}
+                  class:text-emerald-500={task.status === 'ok'}
                   >{Math.round(task.percent)}%</span
                 >
               </li>

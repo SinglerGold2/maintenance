@@ -3,6 +3,20 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.15.0 - 2026-11-19
+
+### Added
+
+- A second dashboard card, Maintenance by printer: one printer picked from a
+  list, with every task it carries, its schedule and its printed hours. The
+  existing card keeps the whole fleet.
+
+### Fixed
+
+- The dots and the coloured figures on the card were invisible. The classes were
+  built from a variable, which the stylesheet compiler cannot see, so the rules
+  never reached the bundle. They are written out now.
+
 ## 0.14.7 - 2026-11-19
 
 ### Changed

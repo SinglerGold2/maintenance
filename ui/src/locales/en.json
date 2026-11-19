@@ -111,5 +111,11 @@
   "maintenance.manual.checkTitle": "When something looks wrong",
   "maintenance.manual.check1": "No counter moves: is the printer the same one the server knows? A printer set up anew starts at zero.",
   "maintenance.manual.check2": "Tool hours are missing: the G-code has to sit in the server's storage as a finished print, and the module needs read_storage.",
-  "maintenance.manual.check3": "Everything green although you printed: display value and server hours apart? Type the display value in again."
+  "maintenance.manual.check3": "Everything green although you printed: display value and server hours apart? Type the display value in again.",
+  "maintenance.cards.printer.heading": "Maintenance",
+  "maintenance.cards.printer.choose": "Printer",
+  "maintenance.cards.printer.loading": "Loading…",
+  "maintenance.cards.printer.none": "No printer yet.",
+  "maintenance.cards.printer.set": "Schedule",
+  "maintenance.cards.printer.hours": "Printed"
 }

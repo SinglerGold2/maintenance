@@ -3,7 +3,7 @@
 
 name: maintenance
 kind: sink
-version: 0.14.7
+version: 0.15.0
 license: MIT
 title: Maintenance
 summary: Print-hour schedules per printer, nozzle life by material and tool hours read from your G-code.
@@ -57,5 +57,11 @@ ui:
         title: Maintenance due
         description: The tasks that are due now or due soon, on every printer.
         icon: list-checks
+        size: {w: 4, h: 3}
+        least: {w: 3, h: 2}
+      - id: printer
+        title: Maintenance by printer
+        description: One printer of your choice, with every task it carries and how far each has run.
+        icon: wrench
         size: {w: 4, h: 3}
         least: {w: 3, h: 2}
