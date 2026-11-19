@@ -3,6 +3,13 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.14.4 - 2026-11-19
+
+### Changed
+
+- The manual says tool hours are counted to the second, and why: on an INDX print
+  a nozzle may work for forty seconds, which a count in whole minutes would hide.
+
 ## 0.14.3 - 2026-11-19
 
 ### Changed

@@ -98,7 +98,7 @@
   "maintenance.manual.nozzles": "A nozzle line chooses its material, and the interval follows the life of that material:",
   "maintenance.manual.nozzleLife": "Life",
   "maintenance.manual.toolsTitle": "Tool hours from the G-code",
-  "maintenance.manual.tools": "Each printer's tab also shows how many hours ran through every tool. The module reads the G-code of finished prints, .gcode and .bgcode, deflate, heatshrink and MeatPack included, and splits the print's length by the filament each tool pushed. The figure is an indication, not a measurement, and the tab says so. After a nozzle change, Start over at 0 resets that tool alone; the printer's counter stays where it is.",
+  "maintenance.manual.tools": "Each printer's tab also shows how many hours ran through every tool. The module reads the G-code of finished prints, .gcode and .bgcode, deflate, heatshrink and MeatPack included, and splits the print's length by the filament each tool pushed. The figure is an indication, not a measurement, and the tab says so. After a nozzle change, Start over at 0 resets that tool alone; the printer's counter stays where it is. Time is kept to the second: on an INDX print a nozzle sometimes works for forty seconds, and counted in whole minutes that would look as if nothing had been recorded at all. Not out of pedantry - well, a little.",
   "maintenance.manual.statusTitle": "The colours",
   "maintenance.manual.status": "Every task carries a state, and the state follows the share of its interval that is used:",
   "maintenance.manual.statusOk": "green: time left, the task is not marked.",
