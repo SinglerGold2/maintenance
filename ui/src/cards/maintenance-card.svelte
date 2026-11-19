@@ -45,7 +45,7 @@
 
   const badges: Record<string, BadgeVariant> = {
     due: 'stateFault',
-    soon: 'stateAttention',
+    soon: 'warning',
     ok: 'stateDone',
   };
 
@@ -122,7 +122,7 @@
               <span
                 class="size-2 shrink-0 rounded-full"
                 class:bg-state-fault-edge={row.worst === 'due'}
-                class:bg-state-attention-edge={row.worst === 'soon'}
+                class:bg-warning={row.worst === 'soon'}
                 class:bg-state-done-edge={row.worst === 'ok'}
               ></span>
               <span class="truncate font-medium">{row.device}</span>
@@ -138,7 +138,7 @@
                   <span
                     class="size-1.5 shrink-0 rounded-full"
                     class:bg-state-fault-edge={task.status === 'due'}
-                    class:bg-state-attention-edge={task.status === 'soon'}
+                    class:bg-warning={task.status === 'soon'}
                     class:bg-state-done-edge={task.status === 'ok'}
                   ></span>
                   <span class="text-neutral-600 truncate">{task.name}</span>
@@ -146,7 +146,7 @@
                 <span
                   class="shrink-0 tabular-nums"
                   class:text-state-fault-text={task.status === 'due'}
-                  class:text-state-attention-text={task.status === 'soon'}
+                  class:text-warning-text={task.status === 'soon'}
                   class:text-state-done-text={task.status === 'ok'}
                   >{Math.round(task.percent)}%</span
                 >
