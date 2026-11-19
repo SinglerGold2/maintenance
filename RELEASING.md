@@ -46,8 +46,14 @@ Everything belongs in `~/harness/maintenance-release/<version>/`:
   maintenance-<version>.tar.gz
   maintenance-<version>-windows-amd64.zip
   RELEASE-<version>.md      the release notes, the text of the GitHub page
-  build/                    the unpacked release directory, as it was built
+  maintenance_darwin_arm64  the four binaries, one per platform
+  maintenance_linux_amd64
+  maintenance_linux_arm64
+  maintenance_windows_amd64.exe
 ```
+
+What is not uploaded to the release page is not kept: the unpacked release
+directory is scratch, and its contents are covered by the bundle.
 
 `release/` in the project is a working directory: `make release` wipes it. What
 is worth keeping goes to the archive before the next build.
