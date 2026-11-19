@@ -3,6 +3,13 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.14.5 - 2026-11-19
+
+### Changed
+
+- The sentence about pedantry in the manual says what it means: it sounds like
+  pedantry, it isn't, and then admits the rest.
+
 ## 0.14.4 - 2026-11-19
 
 ### Changed
