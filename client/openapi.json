@@ -456,11 +456,16 @@
                       "items": {
                         "$ref": "#/components/schemas/Device"
                       }
+                    },
+                    "language": {
+                      "type": "string",
+                      "description": "The language of the module's own pages: system, en, de or cs."
                     }
                   },
                   "required": [
                     "alert_percent",
-                    "devices"
+                    "devices",
+                    "language"
                   ]
                 }
               }
