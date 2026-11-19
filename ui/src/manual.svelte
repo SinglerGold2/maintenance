@@ -242,6 +242,15 @@
         <h3 class="mt-2 font-semibold">{m('languageTitle')}</h3>
         <p>{m('language')}</p>
         <p class="text-neutral-500">{m('languageRestart')}</p>
+        <p class="text-neutral-500">{m('languageContribute')}</p>
+        <p>
+          <a
+            class="underline"
+            href="https://github.com/SinglerGold2/maintenance"
+            target="_blank"
+            rel="noreferrer">{m('languageRepo')}</a
+          >
+        </p>
 
         <h3 class="mt-2 font-semibold">{m('whereTitle')}</h3>
         <p>{m('where')}</p>
