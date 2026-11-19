@@ -5,7 +5,7 @@
   import { heldHost } from '../host';
   import { maintenanceOn, type Overview, type TaskView } from '../maintenance';
 
-  let { title }: CardProps = $props();
+  let { config, title }: CardProps = $props();
 
   const host = heldHost();
   const t = host.t;
@@ -20,17 +20,29 @@
       .catch(() => undefined);
   });
 
+  // The card's setting: a printer id, or empty for the whole fleet. A printer
+  // that is gone leaves the card empty rather than silently showing another.
+  const wanted = $derived(
+    typeof config.device === 'string' ? config.device : '',
+  );
+
+  const devices = $derived(overview?.devices ?? []);
+
+  const missing = $derived(
+    wanted !== '' && !devices.some((d) => d.id === wanted),
+  );
+
   interface Row {
     device: string;
     tasks: TaskView[];
     worst: string;
+    set: string;
+    hours: number | undefined;
   }
 
   const weights: Record<string, number> = { due: 0, soon: 1, ok: 2 };
   const weight = (status: string) => weights[status] ?? 2;
 
-  // The app's own state tints, so a dot reads the same here as on the printer
-  // screen and follows the theme rather than a colour of our own.
   const badges: Record<string, BadgeVariant> = {
     due: 'stateFault',
     soon: 'stateAttention',
@@ -46,10 +58,11 @@
     return t('maintenance.page.statusOk');
   };
 
-  // Every printer keeps its own block, and every task of it is shown: a green
-  // line is the proof that this interval is still fine, not noise to hide.
+  // One printer when the setting names one, the whole fleet otherwise. Every
+  // task is shown: a green line is the proof that this interval still holds.
   const rows = $derived<Row[]>(
-    (overview?.devices ?? [])
+    devices
+      .filter((device) => wanted === '' || device.id === wanted)
       .map((device) => {
         const tasks = [...device.tasks].sort((a, b) => b.percent - a.percent);
         const worst = tasks.reduce(
@@ -62,22 +75,45 @@
           device: device.name ?? device.model ?? device.id,
           tasks,
           worst,
+          set: device.set_name ?? '',
+          hours: device.printer_hours,
         };
       })
       .sort((a, b) => weight(a.worst) - weight(b.worst)),
   );
+
+  const single = $derived(wanted !== '' && rows.length === 1);
 </script>
 
 <div class="flex flex-col gap-2">
   <h3 class="text-base font-semibold">
-    {title.trim() === '' ? t('maintenance.cards.due.heading') : title}
+    {title.trim() === '' ? t('maintenance.cards.maintenance.heading') : title}
   </h3>
 
   {#if !overview}
-    <p class="text-neutral-600 text-sm">{t('maintenance.cards.due.loading')}</p>
+    <p class="text-neutral-600 text-sm">
+      {t('maintenance.cards.maintenance.loading')}
+    </p>
+  {:else if missing}
+    <p class="text-neutral-600 text-sm">
+      {t('maintenance.cards.maintenance.missing')}
+    </p>
   {:else if rows.length === 0}
-    <p class="text-neutral-600 text-sm">{t('maintenance.cards.due.none')}</p>
+    <p class="text-neutral-600 text-sm">
+      {t('maintenance.cards.maintenance.none')}
+    </p>
   {:else}
+    {#if single && rows[0]}
+      <p class="text-neutral-500 text-xs">
+        {rows[0].set
+          ? `${t('maintenance.cards.maintenance.set')}: ${rows[0].set}`
+          : ''}
+        {rows[0].hours !== undefined
+          ? ` · ${t('maintenance.cards.maintenance.hours')}: ${String(Math.round(rows[0].hours))} h`
+          : ''}
+      </p>
+    {/if}
+
     <ul class="flex max-h-64 flex-col gap-3 overflow-y-auto text-sm">
       {#each rows as row (row.device)}
         <li class="flex flex-col gap-1">

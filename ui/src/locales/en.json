@@ -35,9 +35,6 @@
   "maintenance.page.confirmDoneTitle": "Did you really do this maintenance?",
   "maintenance.page.confirmDoneBody": "The counter starts again at the printer's current hours. Only press yes once the work is done.",
   "maintenance.page.confirmDoneYes": "Yes, it is done",
-  "maintenance.cards.due.heading": "Maintenance due",
-  "maintenance.cards.due.none": "Nothing is due. Every task is inside its interval.",
-  "maintenance.cards.due.loading": "Reading the fleet…",
   "maintenance.tab.waiting": "Reading this printer…",
   "maintenance.page.templateNote": "One schedule for every printer. Change an interval here and every printer's task of that name follows; its hours and Done stay on the printer's Maintenance tab.",
   "maintenance.tab.tools": "Print hours per tool",
@@ -112,10 +109,12 @@
   "maintenance.manual.check1": "No counter moves: is the printer the same one the server knows? A printer set up anew starts at zero.",
   "maintenance.manual.check2": "Tool hours are missing: the G-code has to sit in the server's storage as a finished print, and the module needs read_storage.",
   "maintenance.manual.check3": "Everything green although you printed: display value and server hours apart? Type the display value in again.",
-  "maintenance.cards.printer.heading": "Maintenance",
-  "maintenance.cards.printer.choose": "Printer",
-  "maintenance.cards.printer.loading": "Loading…",
-  "maintenance.cards.printer.none": "No printer yet.",
-  "maintenance.cards.printer.set": "Schedule",
-  "maintenance.cards.printer.hours": "Printed"
+  "maintenance.cards.maintenance.heading": "Maintenance",
+  "maintenance.cards.maintenance.loading": "Loading…",
+  "maintenance.cards.maintenance.none": "No printer yet.",
+  "maintenance.cards.maintenance.missing": "The printer this card points at is gone. Pick another in the card's settings.",
+  "maintenance.cards.maintenance.set": "Schedule",
+  "maintenance.cards.maintenance.hours": "Printed",
+  "maintenance.card.all": "All printers",
+  "maintenance.card.printer": "Printer"
 }

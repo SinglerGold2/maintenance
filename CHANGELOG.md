@@ -11,9 +11,11 @@ first. `version:` in `module.yaml` is the newest heading below.
   the nozzle lives, the tool hours, what each colour means, and what to check
   when a figure looks wrong. It carries English and German, independent of the
   interface language.
-- A second dashboard card, Maintenance by printer: one printer chosen from a
-  list, with every task it carries, its schedule and its printed hours. The
-  first card keeps the whole fleet.
+- One dashboard card, Maintenance, with a setting: all printers, or one picked
+  from the fleet. Put one card per printer on the dashboard and name each in its
+  title, or leave the setting at all printers for the fleet view. The card keeps
+  the printer name, every task with its share, the schedule and the printed
+  hours.
 - The Maintenance due card names the printer. A printer without a name shows its
   model.
 
