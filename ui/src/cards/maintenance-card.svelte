@@ -85,7 +85,7 @@
   const single = $derived(wanted !== '' && rows.length === 1);
 </script>
 
-<div class="flex flex-col gap-2">
+<div class="flex h-full min-h-0 flex-col gap-2">
   <h3 class="text-base font-semibold">
     {title.trim() === '' ? t('maintenance.cards.maintenance.heading') : title}
   </h3>
@@ -114,7 +114,7 @@
       </p>
     {/if}
 
-    <ul class="flex max-h-64 flex-col gap-3 overflow-y-auto text-sm">
+    <ul class="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto text-sm">
       {#each rows as row (row.device)}
         <li class="flex flex-col gap-1">
           <div class="flex items-center justify-between gap-2">
