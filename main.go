@@ -237,6 +237,8 @@ func methods() wirerpc.Methods {
 				sent.AlertPercent = defaultAlertPercent
 			}
 
+			sent.Language = normalizeLanguage(sent.Language)
+
 			if !isLanguage(sent.Language) {
 				sent.Language = defaultLanguage
 			}
@@ -1488,6 +1490,30 @@ type stdio struct{}
 func (stdio) Read(p []byte) (int, error)  { return os.Stdin.Read(p) }
 func (stdio) Write(p []byte) (int, error) { return os.Stdout.Write(p) }
 func (stdio) Close() error                { return os.Stdin.Close() }
+
+// normalizeLanguage turns what an operator types into a tag this build has:
+// a country code (cz), a language name, a full tag (de-DE), or the word for
+// following the browser.
+func normalizeLanguage(written string) string {
+	tag := strings.ToLower(strings.TrimSpace(written))
+
+	switch tag {
+	case "", "system", "auto", "browser":
+		return defaultLanguage
+	case "cz", "cs-cz", "cesky", "čeština", "cestina", "czech":
+		return "cs"
+	case "de-de", "de-at", "de-ch", "deutsch", "german", "ger":
+		return "de"
+	case "en-us", "en-gb", "english", "eng":
+		return "en"
+	}
+
+	if len(tag) > 2 {
+		tag = tag[:2]
+	}
+
+	return tag
+}
 
 // isLanguage answers whether a tag is one this build ships, or "system".
 func isLanguage(tag string) bool {
