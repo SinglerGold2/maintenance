@@ -3,7 +3,17 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
-## 0.13.1 - 2026-11-19
+## 0.14.0 - 2026-11-19
+
+### Added
+
+- A manual page beside the module: what it counts, how a printer picks its set,
+  the nozzle lives, the tool hours, what each colour means and what to check when
+  a figure looks wrong. It carries English and German, independent of the
+  interface language.
+- The Maintenance due card names the printer and shows every task with its share
+  of the interval and a coloured dot, red first, then yellow, then green. Before,
+  a printer's name was not drawn at all and only the marked tasks appeared.
 
 ### Changed
 

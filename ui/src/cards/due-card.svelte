@@ -2,7 +2,7 @@
   import type { CardProps } from '@prusa/connect-ui/slots';
 
   import { heldHost } from '../host';
-  import { maintenanceOn, type Overview } from '../maintenance';
+  import { maintenanceOn, type Overview, type TaskView } from '../maintenance';
 
   let { title }: CardProps = $props();
 
@@ -19,15 +19,54 @@
       .catch(() => undefined);
   });
 
-  const due = $derived(
-    (overview?.devices ?? []).flatMap((device) =>
-      device.tasks
-        .filter((task) => task.status !== 'ok')
-        .map((task) => ({
+  interface Row {
+    device: string;
+    tasks: TaskView[];
+    worst: string;
+  }
+
+  const weights: Record<string, number> = { due: 0, soon: 1, ok: 2 };
+  const dots: Record<string, string> = {
+    due: 'bg-red-500',
+    soon: 'bg-amber-500',
+    ok: 'bg-emerald-500',
+  };
+  const texts: Record<string, string> = {
+    due: 'text-red-500',
+    soon: 'text-amber-500',
+    ok: 'text-emerald-500',
+  };
+  const labels: Record<string, string> = {
+    due: 'maintenance.page.statusDue',
+    soon: 'maintenance.page.statusSoon',
+    ok: 'maintenance.page.statusOk',
+  };
+
+  const weight = (status: string) => weights[status] ?? 2;
+  const dot = (status: string): string => dots[status] ?? 'bg-emerald-500';
+  const text = (status: string): string => texts[status] ?? 'text-emerald-500';
+  const label = (status: string): string =>
+    t(labels[status] ?? 'maintenance.page.statusOk');
+
+  // Every printer keeps its own block, and every task of it is shown: a green
+  // line is the proof that this interval is still fine, not noise to hide.
+  const rows = $derived<Row[]>(
+    (overview?.devices ?? [])
+      .map((device) => {
+        const tasks = [...device.tasks].sort((a, b) => b.percent - a.percent);
+        const worst = tasks.reduce(
+          (worst, task) =>
+            weight(task.status) < weight(worst) ? task.status : worst,
+          'ok',
+        );
+
+        return {
           device: device.name ?? device.model ?? device.id,
-          task,
-        })),
-    ),
+          tasks,
+          worst,
+        };
+      })
+      .sort((a, b) => weight(a.worst) - weight(b.worst)),
   );
 </script>
 
@@ -38,22 +77,37 @@
 
   {#if !overview}
     <p class="text-neutral-600 text-sm">{t('maintenance.cards.due.loading')}</p>
-  {:else if due.length === 0}
+  {:else if rows.length === 0}
     <p class="text-neutral-600 text-sm">{t('maintenance.cards.due.none')}</p>
   {:else}
-    <ul class="flex flex-col gap-1 text-sm">
-      {#each due as row (row.device + row.task.id)}
-        <li class="flex justify-between gap-2">
-          <span>{row.task.name}</span>
-          <span
-            class:font-semibold={true}
-            class:text-red-600={row.task.status === 'due'}
-            class:text-amber-600={row.task.status === 'soon'}
-          >
-            {row.task.status === 'due'
-              ? t('maintenance.page.statusDue')
-              : t('maintenance.page.statusSoon')}
-          </span>
+    <ul class="flex max-h-64 flex-col gap-3 overflow-y-auto text-sm">
+      {#each rows as row (row.device)}
+        <li class="flex flex-col gap-1">
+          <div class="flex items-center justify-between gap-2">
+            <span class="flex min-w-0 items-center gap-2">
+              <span class="size-2 shrink-0 rounded-full {dot(row.worst)}"
+              ></span>
+              <span class="truncate font-medium">{row.device}</span>
+            </span>
+            <span class="shrink-0 text-xs {text(row.worst)}"
+              >{label(row.worst)}</span
+            >
+          </div>
+          <ul class="flex flex-col gap-0.5 pl-4 text-xs">
+            {#each row.tasks as task (task.id)}
+              <li class="flex items-center justify-between gap-2">
+                <span class="flex min-w-0 items-center gap-2">
+                  <span
+                    class="size-1.5 shrink-0 rounded-full {dot(task.status)}"
+                  ></span>
+                  <span class="text-neutral-600 truncate">{task.name}</span>
+                </span>
+                <span class="shrink-0 tabular-nums {text(task.status)}"
+                  >{Math.round(task.percent)}%</span
+                >
+              </li>
+            {/each}
+          </ul>
         </li>
       {/each}
     </ul>
