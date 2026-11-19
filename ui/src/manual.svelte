@@ -239,6 +239,10 @@
           </figcaption>
         </figure>
 
+        <h3 class="mt-2 font-semibold">{m('languageTitle')}</h3>
+        <p>{m('language')}</p>
+        <p class="text-neutral-500">{m('languageRestart')}</p>
+
         <h3 class="mt-2 font-semibold">{m('whereTitle')}</h3>
         <p>{m('where')}</p>
 

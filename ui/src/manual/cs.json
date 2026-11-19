@@ -43,5 +43,8 @@
   "captionTasks": "Úkoly dodaného plánu s materiálem trysky u každého řádku a intervalem, který z něj plyne.",
   "captionGallery": "Přidání karty z galerie: existuje jedna karta Maintenance, její nastavení rozhoduje, co ukazuje.",
   "captionSettings": "Nastavení karty: všechny tiskárny, nebo jedna z flotily. Tak vzniká i karta pro každou tiskárnu.",
-  "captionDashboard": "Dvě karty na jedné nástěnce, jedna pro flotilu a jedna pro jednu tiskárnu."
+  "captionDashboard": "Dvě karty na jedné nástěnce, jedna pro flotilu a jedna pro jednu tiskárnu.",
+  "languageTitle": "Jazyk",
+  "language": "Jazyk rozšíření se nastavuje na serveru, ne zde: Rozšíření, Maintenance, Settings, pole language. Hodnota system znamená jazyk prohlížeče, en, de nebo cs pevně zvolí jeden. Čeština je cs, ne cz, kód země se však přijme.",
+  "languageRestart": "Volba se uloží hned a čte se při startu, takže se modul po uložení restartuje. Zvolte klidnou chvíli: import, který právě běží, nebo tisk, jehož G-code se čte, tím restartem skončí. Jazyk, který balíček neobsahuje, se vrátí k jazyku prohlížeče a odtud k angličtině. Tlačítka výše přepnou jazyk pro tuto návštěvu, aniž by cokoli ukládala."
 }
