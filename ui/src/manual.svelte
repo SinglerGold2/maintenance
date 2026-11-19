@@ -81,10 +81,10 @@
   <Card>
     <CardContent>
       <div class="flex flex-col gap-3 text-sm">
-        <h3 class="font-medium">{m('whatTitle')}</h3>
+        <h3 class="font-semibold">{m('whatTitle')}</h3>
         <p>{m('what')}</p>
 
-        <h3 class="mt-2 font-medium">{m('countersTitle')}</h3>
+        <h3 class="mt-2 font-semibold">{m('countersTitle')}</h3>
         <p>{m('counters')}</p>
         <ol class="ml-4 list-decimal">
           <li>{m('countersStep1')}</li>
@@ -104,7 +104,7 @@
           </figcaption>
         </figure>
 
-        <h3 class="mt-2 font-medium">{m('setsTitle')}</h3>
+        <h3 class="mt-2 font-semibold">{m('setsTitle')}</h3>
         <p>{m('sets')}</p>
         <ul class="ml-4 list-disc">
           <li>{m('setsShipped')}</li>
@@ -125,10 +125,10 @@
           </figcaption>
         </figure>
 
-        <h3 class="mt-2 font-medium">{m('intervalsTitle')}</h3>
+        <h3 class="mt-2 font-semibold">{m('intervalsTitle')}</h3>
         <p>{m('intervals')}</p>
 
-        <h3 class="mt-2 font-medium">{m('nozzlesTitle')}</h3>
+        <h3 class="mt-2 font-semibold">{m('nozzlesTitle')}</h3>
         <p>{m('nozzles')}</p>
         <Table class="mt-1 max-w-md">
           <TableHeader>
@@ -177,18 +177,30 @@
           </figcaption>
         </figure>
 
-        <h3 class="mt-2 font-medium">{m('toolsTitle')}</h3>
+        <h3 class="mt-2 font-semibold">{m('toolsTitle')}</h3>
         <p>{m('tools')}</p>
 
-        <h3 class="mt-2 font-medium">{m('statusTitle')}</h3>
+        <h3 class="mt-2 font-semibold">{m('statusTitle')}</h3>
         <p>{m('status')}</p>
-        <ul class="ml-4 list-disc">
-          <li>{m('statusOk')}</li>
-          <li>{m('statusSoon')}</li>
-          <li>{m('statusDue')}</li>
+        <ul class="ml-4 flex list-none flex-col gap-1">
+          <li>
+            <span class="font-semibold text-state-done-text"
+              >{m('statusOkWord')}</span
+            >: {m('statusOkBody')}
+          </li>
+          <li>
+            <span class="font-semibold text-warning-text"
+              >{m('statusSoonWord')}</span
+            >: {m('statusSoonBody')}
+          </li>
+          <li>
+            <span class="font-semibold text-state-fault-text"
+              >{m('statusDueWord')}</span
+            >: {m('statusDueBody')}
+          </li>
         </ul>
 
-        <h3 class="mt-2 font-medium">{m('cardTitle')}</h3>
+        <h3 class="mt-2 font-semibold">{m('cardTitle')}</h3>
         <p>{m('card')}</p>
 
         <figure class="mt-2">
@@ -227,10 +239,10 @@
           </figcaption>
         </figure>
 
-        <h3 class="mt-2 font-medium">{m('whereTitle')}</h3>
+        <h3 class="mt-2 font-semibold">{m('whereTitle')}</h3>
         <p>{m('where')}</p>
 
-        <h3 class="mt-2 font-medium">{m('checkTitle')}</h3>
+        <h3 class="mt-2 font-semibold">{m('checkTitle')}</h3>
         <ul class="ml-4 list-disc">
           <li>{m('check1')}</li>
           <li>{m('check2')}</li>

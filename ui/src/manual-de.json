@@ -24,9 +24,6 @@
   "tools": "Der Reiter jedes Druckers zeigt zusätzlich, wie viele Stunden durch jedes Werkzeug liefen. Das Modul liest dafür den G-code fertiger Drucke, .gcode und .bgcode, inklusive deflate, Heatshrink und MeatPack. Die Drucklänge wird nach dem Filament aufgeteilt, das jedes Werkzeug gefördert hat. Der Wert ist ein Richtwert, keine Messung; der Reiter sagt das auch. Nach einem Düsenwechsel setzt Start over at 0 genau dieses Werkzeug zurück, der Zähler des Druckers bleibt unberührt. Gezählt wird auf die Sekunde genau: Bei einem INDX-Druck arbeitet eine Düse manchmal nur vierzig Sekunden, und in ganzen Minuten gezählt sähe das aus, als wäre nichts erfasst worden. Das klingt nach Pedanterie, ist es aber nicht - na gut, ein bisschen.",
   "statusTitle": "Die Farben",
   "status": "Jede Aufgabe trägt einen Zustand, und der folgt dem Anteil des Intervalls, der verbraucht ist. Die Zustände bestimmen zwei Dinge: den Punkt vor der Aufgabe und ihre Stelle in der Liste ihres Druckers.",
-  "statusOk": "grün: genug Zeit. Der verbrauchte Anteil liegt unter der Schwelle, die Aufgabe steht in ihrer Gruppe unten.",
-  "statusSoon": "gelb: die Schwelle ist erreicht, standardmäßig 90 Prozent des Intervalls. Jetzt planen, nicht panisch werden. Sie rückt in ihrer Gruppe über die grünen.",
-  "statusDue": "rot: das Intervall ist überschritten, über 100 Prozent. Die Aufgabe steht oben in ihrer Gruppe, und das Modul veröffentlicht ein Ereignis auf dem Bus.",
   "cardTitle": "Die Karte am Dashboard",
   "card": "Maintenance due listet je Drucker seine Aufgaben mit Farbpunkt und verbrauchtem Anteil. Rot zuerst, dann gelb, dann grün; fehlt der Name eines Druckers, steht das Modell da. Ist bei einem Drucker alles grün, steht seine Gruppe trotzdem da - eine grüne Zeile ist der Beleg, dass dieses Intervall noch trägt.",
   "whereTitle": "Woher die Zahlen kommen",
@@ -42,5 +39,11 @@
   "captionGallery": "Karte aus der Galerie hinzufügen: es gibt eine Maintenance-Karte, ihre Einstellungen entscheiden, was sie zeigt.",
   "captionSettings": "Die Einstellung der Karte: alle Drucker oder einer aus der Flotte. So entsteht auch eine Karte pro Drucker.",
   "captionDashboard": "Zwei Karten auf einem Dashboard, eine für die Flotte und eine für einen einzelnen Drucker.",
-  "nozzleMaterial": "Düsenmaterial"
+  "nozzleMaterial": "Düsenmaterial",
+  "statusOkWord": "grün",
+  "statusOkBody": "genug Zeit. Der verbrauchte Anteil liegt unter der Schwelle, die Aufgabe steht in ihrer Gruppe unten.",
+  "statusSoonWord": "gelb",
+  "statusSoonBody": "die Schwelle ist erreicht, standardmäßig 90 Prozent des Intervalls. Jetzt planen, nicht panisch werden. Sie rückt in ihrer Gruppe über die grünen.",
+  "statusDueWord": "rot",
+  "statusDueBody": "das Intervall ist überschritten, über 100 Prozent. Die Aufgabe steht oben in ihrer Gruppe, und das Modul veröffentlicht ein Ereignis auf dem Bus."
 }
