@@ -119,6 +119,11 @@ The module asks for the fleet, the print history, `read_storage` for the G-code,
 and a database of its own. The service runs as the Docker container
 `prusa-connect-local` on port 8090.
 
+## Releasing
+
+See [RELEASING.md](RELEASING.md): build, sign, store, tag, and the checks
+that make "done" a fact.
+
 ## Translating
 
 Every text this module draws lives in a JSON file, one per language. The
