@@ -39,16 +39,23 @@
     return t('maintenance.manual.' + key);
   }
 
-  const materials: [string, string][] = [
-    ['materialBrass', '500'],
-    ['materialStainlessSteel', '700'],
-    ['materialPlatedCopper', '800'],
-    ['materialHardenedSteel', '1500'],
-    ['materialBimetal', '1700'],
-    ['materialSiliconCarbide', '2500'],
-    ['materialTungstenCarbide', '3000'],
-    ['materialRubyDiamond', '5000'],
+  // The English name stays the one the module and the slicer use; the German
+  // manual hangs a short translation beside it, because a German reader who
+  // sees only "Hardened steel" has to guess which nozzle that is.
+  const materials: [string, string, string][] = [
+    ['materialBrass', '500', 'Messing'],
+    ['materialStainlessSteel', '700', 'Edelstahl'],
+    ['materialPlatedCopper', '800', 'beschicht. Kupfer'],
+    ['materialHardenedSteel', '1500', 'gehärt. Stahl'],
+    ['materialBimetal', '1700', 'Bimetall'],
+    ['materialSiliconCarbide', '2500', 'Siliziumkarbid'],
+    ['materialTungstenCarbide', '3000', 'Wolframkarbid'],
+    ['materialRubyDiamond', '5000', 'Rubin/Diamant'],
   ];
+
+  function materialLabel(english: string, german: string): string {
+    return language === 'de' ? `${english} (${german})` : english;
+  }
 </script>
 
 <div class="flex flex-col gap-4">
@@ -126,14 +133,19 @@
         <Table class="mt-1 max-w-md">
           <TableHeader>
             <TableRow>
-              <TableHead>{t('maintenance.page.nozzleMaterial')}</TableHead>
+              <TableHead>{m('nozzleMaterial')}</TableHead>
               <TableHead>{m('nozzleLife')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {#each materials as material (material[0])}
               <TableRow>
-                <TableCell>{t('maintenance.page.' + material[0])}</TableCell>
+                <TableCell
+                  >{materialLabel(
+                    t('maintenance.page.' + material[0]),
+                    material[2],
+                  )}</TableCell
+                >
                 <TableCell>{material[1]} h</TableCell>
               </TableRow>
             {/each}

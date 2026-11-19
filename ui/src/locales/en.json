@@ -123,5 +123,6 @@
   "maintenance.manual.captionTasks": "Tasks of a shipped schedule, with the nozzle material chosen per line and the interval it brings.",
   "maintenance.manual.captionGallery": "Add a card from the gallery: one Maintenance card exists, and its settings decide what it shows.",
   "maintenance.manual.captionSettings": "The card's setting: all printers, or one from the fleet. One card per printer works this way too.",
-  "maintenance.manual.captionDashboard": "Two cards on one dashboard, one for the fleet and one for a single printer."
+  "maintenance.manual.captionDashboard": "Two cards on one dashboard, one for the fleet and one for a single printer.",
+  "maintenance.manual.nozzleMaterial": "Nozzle material"
 }
