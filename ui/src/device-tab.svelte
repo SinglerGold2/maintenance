@@ -273,7 +273,7 @@
               class="text-sm font-semibold"
               class:text-state-fault-text={task.status === 'due'}
               class:text-state-attention-text={task.status === 'soon'}
-              class:text-neutral-600={task.status === 'ok'}
+              class:text-state-done-text={task.status === 'ok'}
             >
               {statusText(task)}
             </span>
