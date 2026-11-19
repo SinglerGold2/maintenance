@@ -137,7 +137,9 @@ not a fault. Two rules keep it reviewable: the keys stay as they are, and the
 English file is never edited into another language.
 
 The manual's language switch offers whatever files exist, and opens in the
-system language when one matches.
+system language when one matches. File names follow the language tag, which is
+what the browser reports: `cs.json` for Czech, not `cz.json`, which is the
+country.
 
 ## Development
 

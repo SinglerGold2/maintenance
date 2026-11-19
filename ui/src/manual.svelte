@@ -34,6 +34,10 @@
   type Tag = keyof typeof books;
   const tags = Object.keys(books) as Tag[];
 
+  // The file follows the language tag, which is what the browser reports; the
+  // button shows the country, which is what a reader recognises.
+  const labels: Record<Tag, string> = { en: 'EN', de: 'DE', cs: 'CZ' };
+
   function startTag(): Tag {
     const spoken = typeof navigator === 'undefined' ? 'en' : navigator.language;
     const tag = spoken.slice(0, 2).toLowerCase();
@@ -76,7 +80,7 @@
       <Button
         variant={language === tag ? 'secondary' : 'ghost'}
         size="sm"
-        onclick={() => (language = tag)}>{tag.toUpperCase()}</Button
+        onclick={() => (language = tag)}>{labels[tag]}</Button
       >
     {/each}
   </div>
