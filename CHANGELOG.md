@@ -3,90 +3,47 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
-## 0.15.0 - 2026-11-19
-
-### Added
-
-- A second dashboard card, Maintenance by printer: one printer picked from a
-  list, with every task it carries, its schedule and its printed hours. The
-  existing card keeps the whole fleet.
-
-### Fixed
-
-- The dots and the coloured figures on the card were invisible. The classes were
-  built from a variable, which the stylesheet compiler cannot see, so the rules
-  never reached the bundle. They are written out now.
-
-## 0.14.7 - 2026-11-19
-
-### Changed
-
-- The Tasks button on a set is green and outlined. As a ghost button it read as
-  a label next to Disable and Duplicate, and it is the one that opens the plan.
-
-## 0.14.6 - 2026-11-19
-
-### Changed
-
-- The colour section of the manual describes the card as it is now. It said a
-  green task is not marked, which stopped being true when the card began to show
-  every task; the states now say where a task sits and what it triggers.
-
-## 0.14.5 - 2026-11-19
-
-### Changed
-
-- The sentence about pedantry in the manual says what it means: it sounds like
-  pedantry, it isn't, and then admits the rest.
-
-## 0.14.4 - 2026-11-19
-
-### Changed
-
-- The manual says tool hours are counted to the second, and why: on an INDX print
-  a nozzle may work for forty seconds, which a count in whole minutes would hide.
-
-## 0.14.3 - 2026-11-19
-
-### Changed
-
-- The manual says both ways of entering the printer's counter are the same
-  figure. A printer that shows 14d 7h and a printer typed in as 343 h mean the
-  same 343 hours, and the module reads both alike.
-
-## 0.14.2 - 2026-11-19
-
-### Fixed
-
-- The bundle declares the UI library it is actually built against, 0.1.0 as the
-  minimum. It said 0.0.1, which no build of this module has ever run on; a host
-  that old would have loaded a bundle it cannot draw.
-
-## 0.14.1 - 2026-11-19
-
-### Fixed
-
-- The German manual is written with its umlauts. The first draft spelled them as
-  ae, oe and ue, which reads like a telegram.
-
 ## 0.14.0 - 2026-11-19
 
 ### Added
 
 - A manual page beside the module: what it counts, how a printer picks its set,
-  the nozzle lives, the tool hours, what each colour means and what to check when
-  a figure looks wrong. It carries English and German, independent of the
+  the nozzle lives, the tool hours, what each colour means, and what to check
+  when a figure looks wrong. It carries English and German, independent of the
   interface language.
-- The Maintenance due card names the printer and shows every task with its share
-  of the interval and a coloured dot, red first, then yellow, then green. Before,
-  a printer's name was not drawn at all and only the marked tasks appeared.
+- A second dashboard card, Maintenance by printer: one printer chosen from a
+  list, with every task it carries, its schedule and its printed hours. The
+  first card keeps the whole fleet.
+- The Maintenance due card names the printer. A printer without a name shows its
+  model.
 
 ### Changed
 
-- The marketplace card says what the module does today: schedules per printer,
-  nozzle life by material, and tool hours read from the G-code.
+- The due card shows every task with its share of the interval and a coloured
+  dot, red first, then yellow, then green. Before, a printer's name was not drawn
+  at all and only the marked tasks appeared.
+- The manual states that 14d 7h and 343 h are the same figure, and that tool
+  hours are counted to the second: on an INDX print a nozzle may work for forty
+  seconds, which a count in whole minutes would hide.
+- The colour section of the manual describes the card as it is now: where a task
+  sits in its group, and that an all-green printer keeps its group because a
+  green line is the proof that the interval holds.
+- The Tasks button on a set is green and outlined. As a ghost button it read as a
+  label between Disable and Duplicate, and it is the one that opens the plan.
+- The marketplace summary names the schedules, the nozzle life by material and
+  the tool hours read from the G-code.
+- The bundle declares 0.1.0 as the oldest UI library, the one it is built
+  against, instead of 0.0.1.
 - The README opens with the artwork, and its closing section names every source
   of that artwork, its licence and its author.
+
+### Fixed
+
+- The dots and the coloured figures on the card were invisible: the classes were
+  assembled from a variable, which the stylesheet compiler cannot see, so the
+  rules never reached the bundle. They are written out now.
+- The German manual is written with its umlauts. The first draft spelled them as
+  ae, oe and ue, which reads like a telegram.
 
 ## 0.10.2 - 2026-11-17
 
