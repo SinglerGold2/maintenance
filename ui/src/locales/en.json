@@ -84,7 +84,7 @@
   "maintenance.manual.countersTitle": "The two counters",
   "maintenance.manual.counters": "Every printer carries two figures, and they are kept in step:",
   "maintenance.manual.countersStep1": "Server hours: everything this server has printed since the printer was set up.",
-  "maintenance.manual.countersStep2": "Display value: the number on the printer. Type it in once, as 343 or 14d 7h.",
+  "maintenance.manual.countersStep2": "Display value: the number on the printer. Type it in once. On my printer it read 14d 7h; written as 343 h it is the same figure, and the module reads both the same way.",
   "maintenance.manual.countersStep3": "From then on both move with every finished print. When they drift apart, correct the display value again.",
   "maintenance.manual.setsTitle": "Schedules, called sets",
   "maintenance.manual.sets": "A set is a named plan with several lines: a task, an interval, optionally a material. Every printer follows exactly one set.",

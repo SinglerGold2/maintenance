@@ -3,6 +3,14 @@
 What an operator sees change when they upgrade this module, newest release
 first. `version:` in `module.yaml` is the newest heading below.
 
+## 0.14.3 - 2026-11-19
+
+### Changed
+
+- The manual says both ways of entering the printer's counter are the same
+  figure. A printer that shows 14d 7h and a printer typed in as 343 h mean the
+  same 343 hours, and the module reads both alike.
+
 ## 0.14.2 - 2026-11-19
 
 ### Fixed
